@@ -72,7 +72,7 @@ exports.activateAccount = async (req, res) => {
         return res.status(200).json({ message: 'Account activated successfully' });
     } catch (error) {
         console.error('Error during account activation:', error);
-        return res.status(500).json({ message: 'Something went wrong. Please try again later.' });
+        return res.status(500).json({ message: 'Something went wrong. Please try again later. jkn' });
     }
 };
 
