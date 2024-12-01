@@ -6,11 +6,12 @@ const UserSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true, lowercase: true, match: /.+\@.+\..+/ }, // Email validation
   name: { type: String, required: true },
   surname: { type: String, required: true },
-  state: { type: String, required: true },
-  city: { type: String, required: true },
+  state: { type: String, default: null },
+  city: { type: String, default: null },
   password: { type: String, required: true, minlength: 8 }, // Ensure strong passwords
   isActive: { type: Boolean, default: false }, // For email verification
-  activationToken: { type: String, default: null }, // For account activation flow
+  activationToken: { type: String, default: null }, // For account activation flow,
+  resetPasswordToken: { type: String, default: null },
 }, { timestamps: true }); // Adds createdAt and updatedAt fields automatically
 
 UserSchema.pre('save', async function (next) {
@@ -20,7 +21,7 @@ UserSchema.pre('save', async function (next) {
     this.password = await bcrypt.hash(this.password, salt);
     next();
   } catch (err) {
-    next(err); // Pass any errors to the next middleware
+    next(err);
   }
 });
 

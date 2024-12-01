@@ -2,7 +2,6 @@ const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
-const crypto = require('crypto');
 
 const myEmail = process.env.My_Email;
 const password = process.env.MyPassword;
@@ -38,7 +37,7 @@ exports.postSignup = async (req, res) => {
         user.activationToken = token;
         await user.save();
 
-        transport.sendMail({
+        await transport.sendMail({
             from: myEmail,
             to: email,
             subject: 'Activate your account',
@@ -49,7 +48,7 @@ exports.postSignup = async (req, res) => {
             `,
         });
 
-        return res.status(201).json({ message: 'Signup successful! Check your email to activate your account.' });
+        return res.status(201).json({ message: 'Signup successful! Check your email to activate your account.' ,token: token });
     } catch (error) {
         console.error('Error during signup:', error);
         return res.status(500).json({ message: 'Something went wrong. Please try again later.' });
@@ -97,9 +96,66 @@ exports.postLogin = async (req, res) => {
         }
 
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
-        return res.status(200).json({ message: 'Login successful', token });
+        return res.status(200).json({ message: 'Login successful', token:token });
     } catch (error) {
         console.error('Login error:', error);
+        return res.status(500).json({ message: 'Something went wrong. Please try again later.' });
+    }
+};
+
+
+exports.getResitPasswordEmail = async (req, res) => {
+    const email = req.body.email;
+    try{
+        const user = await User.findOne({ email: email });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        user.resetToken = token;
+        await user.save();
+
+        const resetLink = `${process.env.CLIENT_URL}/reset-password/${token}`;
+
+        await transport.sendMail({
+            from: process.env.My_Email,
+            to: email,
+            subject: 'Password Reset Request',
+            html: `
+                <h1>Password Reset Request</h1>
+                <p>Please click the link below to reset your password:</p>
+                <a href="${resetLink}">Reset Password</a>
+            `,
+        });
+
+        return res.status(200).json({ message: 'Password reset link sent to your email', token: token });
+
+    }catch(err){
+        console.log(err)
+    }
+}
+
+exports.postResetPassword = async (req, res) => {
+    const { token } = req.params;
+    const { password } = req.body;
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET); // Verify the reset token
+        const user = await User.findOne({
+            _id: decoded.userId,
+            resetToken: token,
+        });
+
+        if (!user) {
+            return res.status(400).json({ message: 'Invalid or expired token' });
+        }
+
+        user.password = password;
+        user.resetToken = null; // Invalidate the token
+        await user.save();
+
+        res.status(200).json({ message: 'Password reset successfully!' });
+    } catch (err) {
+        console.error('Error resetting password:', err);
         return res.status(500).json({ message: 'Something went wrong. Please try again later.' });
     }
 };
