@@ -3,10 +3,17 @@ require('dotenv').config(); // Load environment variables at the top
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const authRoutes = require('./routes/auth'); // Import auth routes
+const authRoutes = require('./routes/auth');
+const cors = require("cors"); // Import auth routes
+
 
 const app = express();
 
+app.use(cors({
+    origin: 'http://localhost:3000', // This allows requests from your frontend (React app)
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Specify the allowed HTTP methods
+    allowedHeaders: ['Content-Type', 'Authorization'], // Specify the allowed headers
+}));
 const connectDB = async () => {
     try {
         await mongoose.connect(process.env.MONGO_URI, {

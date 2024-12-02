@@ -13,8 +13,11 @@
 
     router.post('/login', auth.postLogin)
 
-    router.post('/reset', auth.getResitPasswordEmail)
+    router.post('/reset-password', auth.getResitPasswordEmail)
 
-    router.post('/reset-password', auth.postResetPassword)
+    router.post('/reset-password/:token', auth.postResetPassword)
+
+    router.post('/recent-activation', auth.resendActivationEmail)
+    router()
 
     module.exports = router;

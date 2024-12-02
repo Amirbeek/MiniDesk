@@ -6,12 +6,13 @@ const UserSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true, lowercase: true, match: /.+\@.+\..+/ }, // Email validation
   name: { type: String, required: true },
   surname: { type: String, required: true },
-  state: { type: String, default: null },
-  city: { type: String, default: null },
-  password: { type: String, required: true, minlength: 8 }, // Ensure strong passwords
-  isActive: { type: Boolean, default: false }, // For email verification
-  activationToken: { type: String, default: null }, // For account activation flow,
+  country: { type: String, default: null },
+  password: { type: String, required: true, minlength: 8 },
+  isActive: { type: Boolean, default: false },
+  activationToken: { type: String, default: null },
   resetPasswordToken: { type: String, default: null },
+  isLogin: { type: Boolean, default: false },
+
 }, { timestamps: true }); // Adds createdAt and updatedAt fields automatically
 
 UserSchema.pre('save', async function (next) {
@@ -31,11 +32,10 @@ UserSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
-// Remove sensitive fields from JSON responses
 UserSchema.set('toJSON', {
   transform: (doc, ret) => {
-    delete ret.password; // Do not expose the password
-    delete ret.activationToken; // Do not expose activation tokens
+    delete ret.password;
+    delete ret.activationToken;
     return ret;
   }
 });
