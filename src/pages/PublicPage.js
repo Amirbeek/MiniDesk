@@ -53,8 +53,8 @@ function PublicPage() {
     return (
         <ThemeProvider theme={theme}>
             <BackgroundImage>
-                <Grid container spacing={0} justifyContent="center">
-                    <Grid item xs={12} sm={4}>
+                <Grid container spacing={0} p={3}  justifyContent="center">
+                    <Grid item xs={12} sm={4} mt={3}>
                         <CardContainer>
                             <Title>
                                 Already have an account? Log in with your email below.
@@ -64,7 +64,7 @@ function PublicPage() {
                             </Button>
                         </CardContainer>
                     </Grid>
-                    <Grid item xs={12} sm={4}>
+                    <Grid item xs={12} sm={4} mt={3}>
                         <CardContainer>
                             <Title>
                                 Are you new here? Sign in with your Google account or create a new account.

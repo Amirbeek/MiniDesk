@@ -86,7 +86,7 @@ const LoginForm = () => {
 
     const handleSubmit = async (values, { setSubmitting }) => {
         try {
-            const response = await axios.post('http://localhost:5000/api/auth/login');
+            const response = await axios.post('http://localhost:5000/api/auth/login', values);
             alert(response.data.message);
             alert(response.data.user)
             localStorage.setItem('authToken', response.data.token);

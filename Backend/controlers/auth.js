@@ -85,7 +85,7 @@ exports.postLogin = async (req, res) => {
         });
 
         if (!user) {
-            return res.status(400).json({ message: 'User not found' });
+            return res.status(400).json({ message: `User not found ${username_or_email} and ${password}` });
         }
 
         if (!user.isActive) {
@@ -93,11 +93,10 @@ exports.postLogin = async (req, res) => {
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
+
         if (!isMatch) {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
-        user.isLogin = true
-        user.save()
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
         return res.status(200).json({ message: 'Login successful', token:token, user:user });
     } catch (error) {

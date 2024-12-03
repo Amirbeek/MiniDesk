@@ -1,44 +1,46 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
-function Dashboard() {
-    const navigate = useNavigate();
+const Dashboard = () => {
+    const [userData, setUserData] = useState(null);
 
-    // Handle logout
-    const logout = async () => {
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const token = localStorage.getItem('authToken');
+                if (!token) return;
 
-        localStorage.removeItem('authToken'); // Remove token from localStorage
-        navigate('/login'); // Redirect to login page
-    };
+                const response = await axios.get('http://localhost:5000/api/dashboard', {
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                setUserData(response.data.user);
+            } catch (error) {
+                console.error('Failed to fetch dashboard data', error);
+            }
+        };
+
+        fetchData();
+    }, []);
 
     return (
-        <div style={{ fontFamily: 'Arial, sans-serif', padding: '20px' }}>
-            <header style={{ marginBottom: '20px' }}>
-                <h1>Welcome to Your Desktop!</h1>
-                <p>You're logged in, and this page is protected.</p>
-            </header>
+        <div>
+            <h1>Dashboard</h1>
+            {userData ? (
+                <div>
+                    <p><strong>Username:</strong> {userData.username}</p>
+                    <p><strong>Email:</strong> {userData.email}</p>
+                    <p><strong>Name:</strong> {userData.name}</p>
+                    <p><strong>Surname:</strong> {userData.surname}</p>
+                    <p><strong>Country:</strong> {userData.country}</p>
+                </div>
 
-            <section style={{ marginBottom: '20px' }}>
-                <h2>Your Dashboard</h2>
-                <p>This is where your content would go.</p>
-            </section>
+            ) : (
+                <p>Loading...</p>
+            )}
 
-            <button
-                onClick={logout}
-                style={{
-                    backgroundColor: '#ff4d4d',
-                    color: 'white',
-                    border: 'none',
-                    padding: '10px 20px',
-                    cursor: 'pointer',
-                    borderRadius: '5px'
-                }}
-
-            >
-                Logout
-            </button>
         </div>
     );
-}
+
+};
 
 export default Dashboard;

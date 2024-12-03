@@ -130,7 +130,7 @@ const RequestPasswordReset = () => {
                                         <Button
                                             variant="text"
                                             style={{ color: theme.whiteColor }}
-                                            onClick={() => navigate('/')} // Navigate to signup page
+                                            onClick={() => navigate('/')}
                                         >
                                             Go Back Home
                                         </Button>
