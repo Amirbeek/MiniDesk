@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Calendar from "../components/Calendar";
+import Settings from "../components/Settings";
 
 const Dashboard = () => {
     const [userData, setUserData] = useState(null);
@@ -9,7 +10,10 @@ const Dashboard = () => {
         const fetchData = async () => {
             try {
                 const token = localStorage.getItem('authToken');
-                if (!token) return;
+                if (!token) {
+                    window.location.href = '/login';
+                    return;
+                }
 
                 const response = await axios.get('http://localhost:5000/api/dashboard', {
                     headers: { Authorization: `Bearer ${token}` },
@@ -28,15 +32,9 @@ const Dashboard = () => {
             <h1>Dashboard</h1>
             {userData ? (
                 <div>
-                    <p><strong>Username:</strong> {userData.username}</p>
-                    <p><strong>Email:</strong> {userData.email}</p>
-                    <p><strong>Name:</strong> {userData.name}</p>
-                    <p><strong>Surname:</strong> {userData.surname}</p>
-                    <p><strong>Country:</strong> {userData.country}</p>
-                    <Calendar/>
+                    <Settings UserInfo={userData} />
+                    <Calendar EventData={userData['events']} />
                 </div>
-
-
             ) : (
                 <p>Loading...</p>
             )}

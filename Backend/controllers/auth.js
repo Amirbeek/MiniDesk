@@ -2,12 +2,9 @@ const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
-
-// Email credentials from environment variables
-const myEmail = process.env.My_Email;
+    const myEmail = process.env.My_Email;
 const password = process.env.MyPassword;
 
-// Nodemailer transport configuration
 const transport = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -19,13 +16,10 @@ const transport = nodemailer.createTransport({
 exports.postSignup = async (req, res) => {
     const { username, email, name, surname, country, password } = req.body;
     try {
-        // Check if the username or email is already taken
         const existingUser = await User.findOne({ $or: [{ username }, { email }] });
         if (existingUser) {
             return res.status(400).json({ message: 'Username or email already taken' });
         }
-
-        // Create a new user
         const user = new User({
             username,
             email,
@@ -98,6 +92,7 @@ exports.postLogin = async (req, res) => {
             return res.status(400).json({ message: 'Invalid credentials' });
         }
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+        console.log(token)
         return res.status(200).json({ message: 'Login successful', token:token, user:user });
     } catch (error) {
         console.error('Login error:', error);
@@ -113,6 +108,7 @@ exports.LogOut = async (req, res) => {
         console.error('Error during logOut:', error);
     }
 }
+
 exports.getResitPasswordEmail = async (req, res) => {
     const email = req.body.email;
     try {
@@ -208,3 +204,21 @@ exports.resendActivationEmail = async (req, res) => {
         return res.status(500).json({ message: 'Something went wrong. Please try again later.' });
     }
 };
+
+exports.DeleteAccount = async (req, res) => {
+    try {
+        const userId = req.user.userId;
+        console.log(userId)
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        await User.deleteOne({ _id: userId });
+        return res.status(200).json({ message: 'Account successfully deleted' });
+    } catch (error) {
+        console.error('Error deleting account:', error);
+        return res.status(500).json({ message: 'Internal Server Error' });
+    }
+}

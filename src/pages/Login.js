@@ -6,6 +6,8 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import axios from 'axios';
 import backgroundImage from '../backround_images/background.png';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const theme = {
     whiteColor: 'hsl(0, 0%, 100%)',
@@ -87,12 +89,13 @@ const LoginForm = () => {
     const handleSubmit = async (values, { setSubmitting }) => {
         try {
             const response = await axios.post('http://localhost:5000/api/auth/login', values);
-            alert(response.data.message);
-            alert(response.data.user)
+            toast.success(response.data.message);
+            navigate('/dashboard');
             localStorage.setItem('authToken', response.data.token);
             navigate('/dashboard');
+            window.location.reload()
         } catch (error) {
-            alert(error.response?.data?.message || 'Login failed');
+            toast.error(error.response?.data?.message || 'Login failed')
         } finally {
             setSubmitting(false);
         }
@@ -174,6 +177,8 @@ const LoginForm = () => {
                     </Formik>
                 </FormContainer>
             </Background>
+            <ToastContainer position="top-right" autoClose={5000} hideProgressBar />
+
         </ThemeProvider>
     );
 };

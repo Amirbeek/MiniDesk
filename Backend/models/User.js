@@ -19,11 +19,29 @@ const eventSchema = new mongoose.Schema({
         type: Date,
         required: true
     },
+    description: {
+        type: String,
+        default: ""
+    },
     isAllDay: {
         type: Boolean,
         default: false
+    },
+    repeat: {
+        type: String,
+        enum: ['none', 'daily', 'weekly', 'monthly', 'yearly', 'custom'], // Define repeat types
+        default: 'none'
+    },
+    customRepeatInterval: {
+        type: Number, // Interval in days for custom repeat
+        default: null
+    },
+    timezone: {
+        type: String,
+        default: "UTC" // Default to UTC
     }
 });
+
 
 const UserSchema = new mongoose.Schema(
     {

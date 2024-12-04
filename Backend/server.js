@@ -10,8 +10,8 @@ const dashboard = require('./routes/dashboard');
 const app = express();
 
 app.use(cors({
-    origin: 'http://localhost:3000', // This allows requests from your frontend (React app)
-    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Specify the allowed HTTP methods
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'], // Specify the allowed headers
 }));
 
