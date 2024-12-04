@@ -1,70 +1,111 @@
-import React, { useEffect, useRef } from "react";
-import Calendar from "tui-calendar";
+import React, { useState } from 'react';
+import { Modal, Box, Button } from '@mui/material';
 import "tui-calendar/dist/tui-calendar.css";
-import "../style/MyCalendar.css"; // Optional for styling
+import "../style/MyCalendar.css";
+import {
+    ScheduleComponent,
+    Day,
+    Week,
+    WorkWeek,
+    Month,
+    Agenda,
+    Inject,
+    ViewDirective,
+    ViewsDirective,
+    DragAndDrop,
+    Resize
+} from "@syncfusion/ej2-react-schedule";
 
 const MyCalendar = () => {
-    const calendarRef = useRef(null);
-    let calendarInstance = null;
+    const [open, setOpen] = useState(false);
 
-    useEffect(() => {
-        calendarInstance = new Calendar(calendarRef.current, {
-            defaultView: "day", // Initial view: "month", "week", "day"
-            taskView: true,
-            scheduleView: true,
-            useCreationPopup: true,
-            useDetailPopup: true,
-        });
-
-        // Example: Add some sample schedules
-        calendarInstance.createSchedules([
+    const localData = {
+        dataSource: [
             {
-                id: "1",
-                calendarId: "1",
-                title: "Meeting with Team",
-                category: "time",
-                start: "2024-12-03T10:00:00",
-                end: "2024-12-03T12:30:00",
+                Id: 1,
+                Subject: "Meeting",
+                Location: "Student Center",
+                StartTime: new Date(2024, 11, 4, 10, 0),
+                EndTime: new Date(2024, 11, 4, 11, 0),
+                IsAllDay: false,
             },
-        ]);
-
-        return () => calendarInstance.destroy();
-    }, []);
-
-    const handleViewChange = (view) => {
-        calendarInstance.changeView(view); // Change calendar view
+            {
+                Id: 2,
+                Subject: "Team Outing",
+                StartTime: new Date(2024, 11, 5, 12, 0),
+                EndTime: new Date(2024, 11, 5, 14, 0),
+                IsAllDay: false,
+            },
+        ],
+        fields: {
+            subject: { name: "Subject", defaultValue: "No Title" },
+            startTime: { name: "StartTime", defaultValue: new Date() },
+            endTime: { name: "EndTime", defaultValue: new Date() },
+        },
     };
 
-    const handleToday = () => {
-        calendarInstance.today(); // Navigate to today
+    const onDragStart = (args) => {
+        if (args.scroll) {
+            args.scroll.enable = true;
+        }
     };
 
-    const handleNavigate = (days) => {
-        const currentDate = calendarInstance.getDate();
-        calendarInstance.setDate(currentDate.addDays(days)); // Navigate by days
+    const onResize = (args) => {
+        if (args.scroll) {
+            args.scroll.enable = true;
+        }
     };
 
-    const handleViewAllEvents = () => {
-        const schedules = calendarInstance.getSchedules();
-        console.log("All Events:", schedules);
-        alert("Check the console for all events!");
-    };
+    const handleOpen = () => setOpen(true);
+    const handleClose = () => setOpen(false);
 
     return (
-        <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
-            {/* Toolbar */}
-            <div style={{ display: "flex", justifyContent: "space-around", padding: "10px", backgroundColor: "#f4f4f4", borderBottom: "1px solid #ccc" }}>
-                <button onClick={() => handleViewChange("month")}>Month</button>
-                <button onClick={() => handleViewChange("week")}>Week</button>
-                <button onClick={() => handleViewChange("day")}>Day</button>
-                <button onClick={handleToday}>Today</button>
-                <button onClick={() => handleNavigate(-1)}>Yesterday</button>
-                <button onClick={() => handleNavigate(1)}>Tomorrow</button>
-                <button onClick={handleViewAllEvents}>View All Events</button>
-            </div>
+        <div>
+            {/* Button to open the calendar modal */}
+            <Button variant="contained" color="primary" onClick={handleOpen}>
+                Open Calendar
+            </Button>
 
-            {/* Calendar */}
-            <div ref={calendarRef} style={{ flex: 1, height: "100%" }} />
+            {/* Modal */}
+            <Modal open={open} onClose={handleClose} aria-labelledby="calendar-modal" aria-describedby="calendar-modal-description">
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: '80%',
+                        maxHeight: '80%',
+                        bgcolor: 'background.paper',
+                        boxShadow: 24,
+                        p: 4,
+                        overflowY: 'auto',
+                        display: 'flex',
+                        justifyContent: 'center',
+                    }}
+                >
+                    {/* Calendar inside the modal */}
+                    <ScheduleComponent
+                        width="100%"
+                        height="600px"
+                        currentView="Month"
+                        eventSettings={localData}
+                        allowDragAndDrop={true}
+                        allowResize={true}
+                        dragStart={onDragStart}
+                        resize={onResize}
+                    >
+                        <ViewsDirective>
+                            <ViewDirective option="Day" />
+                            <ViewDirective option="Week" />
+                            <ViewDirective option="WorkWeek" showWeekNumber={true} />
+                            <ViewDirective option="Month" isSelected={true} />
+                            <ViewDirective option="Agenda" />
+                        </ViewsDirective>
+                        <Inject services={[Day, Week, WorkWeek, Month, Agenda, DragAndDrop, Resize]} />
+                    </ScheduleComponent>
+                </Box>
+            </Modal>
         </div>
     );
 };

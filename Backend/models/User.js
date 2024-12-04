@@ -1,6 +1,29 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
+const eventSchema = new mongoose.Schema({
+    subject: {
+        type: String,
+        required: true,
+        default: "No Title"
+    },
+    location: {
+        type: String,
+        default: "Not provided"
+    },
+    startTime: {
+        type: Date,
+        required: true
+    },
+    endTime: {
+        type: Date,
+        required: true
+    },
+    isAllDay: {
+        type: Boolean,
+        default: false
+    }
+});
 
 const UserSchema = new mongoose.Schema(
     {
@@ -13,16 +36,7 @@ const UserSchema = new mongoose.Schema(
       isActive: { type: Boolean, default: false },
       activationToken: { type: String, default: null },
       resetPasswordToken: { type: String, default: null },
-      events: [
-        {
-          title: { type: String, required: true },
-          description: { type: String, default: "" },
-          startTime: { type: Date, required: true },
-          endTime: { type: Date, required: true },
-          allDay: { type: Boolean, default: false },
-          location: { type: String, default: "" },
-        },
-      ],
+      events: [eventSchema],
     },
     { timestamps: true }
 );
@@ -38,8 +52,6 @@ UserSchema.pre('save', async function (next) {
   }
 });
 
-
-// Compare hashed passwords
 UserSchema.methods.comparePassword = async function (candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };

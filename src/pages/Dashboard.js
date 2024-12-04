@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import Calendar from "../components/Calendar";
 
 const Dashboard = () => {
     const [userData, setUserData] = useState(null);
@@ -32,7 +33,9 @@ const Dashboard = () => {
                     <p><strong>Name:</strong> {userData.name}</p>
                     <p><strong>Surname:</strong> {userData.surname}</p>
                     <p><strong>Country:</strong> {userData.country}</p>
+                    <Calendar/>
                 </div>
+
 
             ) : (
                 <p>Loading...</p>
