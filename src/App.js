@@ -22,7 +22,6 @@ function App() {
                     <Route path="/" element={<PublicPage />} />
                     <Route path='/dashboard' element={isAuthenticated ?<Dashboard /> : <LoginForm/>}/>
                     <Route path="/register" element={<SignupForm />} />
-
                     <Route path="/GOP" element={<Callendarr />} />
                     <Route path="/login" element={<LoginForm />} />
                     <Route path="/reset-password-request" element={<ResetPasswordRequest />} />

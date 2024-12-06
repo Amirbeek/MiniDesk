@@ -1,6 +1,7 @@
 exports.postEditAccount = async (req, res) =>{
     try {
         const userId= req.user.userId;
+        const {username, name , surname, country}=req.body
         const user = await User.findById(userId);
         if (!user) {
             return res.status(400).send({message: 'User not found'});
@@ -10,5 +11,4 @@ exports.postEditAccount = async (req, res) =>{
         console.error('Error Editing Account Details:', e.message);
         res.status(500).json({ message: 'Error Editing Account Details' });
     }
-
 }
