@@ -2,8 +2,18 @@ const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
-    const myEmail = process.env.My_Email;
+const myEmail = process.env.My_Email;
 const password = process.env.MyPassword;
+
+
+// this code has to be added for each controller methods
+// const errors = validationResult(req);
+// if (!errors.isEmpty()) {
+//     return res.status(422).json({message: "Validation failed", errors: errors.array()});
+// }
+
+
+
 
 const transport = nodemailer.createTransport({
     service: 'gmail',

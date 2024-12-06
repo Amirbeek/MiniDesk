@@ -4,7 +4,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const authRoutes = require('./routes/auth');
-const cors = require("cors"); // Import auth routes
+const cors = require("cors");
 const dashboard = require('./routes/dashboard');
 
 const app = express();
@@ -12,9 +12,18 @@ const app = express();
 app.use(cors({
     origin: 'http://localhost:3000',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'], // Specify the allowed headers
+    allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
+
+app.use((error, req, res,next) => {
+    console.log(error)
+    const status = error.statusCode || 500;
+    const message = error.message;
+    res.status(status).json({
+        message: message,
+    })
+})
 const connectDB = async () => {
     try {
         await mongoose.connect(process.env.MONGO_URI, {
