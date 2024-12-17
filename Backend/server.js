@@ -10,20 +10,25 @@ const dashboard = require('./routes/dashboard');
 const app = express();
 
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: '*',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
-
+// Global error handling middleware
 app.use((error, req, res,next) => {
     console.log(error)
     const status = error.statusCode || 500;
     const message = error.message;
+    const data = error.data;
     res.status(status).json({
         message: message,
+        data:data
     })
 })
+
+
+// MongoDB connection and starting the server
 const connectDB = async () => {
     try {
         await mongoose.connect(process.env.MONGO_URI, {
@@ -38,9 +43,9 @@ const connectDB = async () => {
 };
 
 connectDB();
-
 app.use(bodyParser.json());
 
+// Routes
 app.use('/api/auth', authRoutes);
 app.use('/api', dashboard)
 

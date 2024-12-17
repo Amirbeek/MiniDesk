@@ -2,6 +2,14 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Calendar from "../components/Calendar";
 import Settings from "../components/Settings";
+import Navbar from "../components/Navbar";
+import styled from "styled-components";
+import {Grid} from "@mui/material";
+const BackImage = styled.div`
+    background: url("https://w0.peakpx.com/wallpaper/236/488/HD-wallpaper-mac-os-ventura-dark-macos-ventura-macbook-apple-computer.jpg") no-repeat center center;
+    background-size: cover;
+    min-height: 100vh;
+`;
 
 const Dashboard = () => {
     const [userData, setUserData] = useState(null);
@@ -29,12 +37,18 @@ const Dashboard = () => {
 
     return (
         <div>
-            <h1>Dashboard</h1>
             {userData ? (
-                <div>
-                    <Settings UserInfo={userData} />
-                    <Calendar EventData={userData['events']} />
-                </div>
+                <BackImage>
+                    <Navbar UserInfo={userData}/>
+                    <Grid container spacing={2}>
+                        <Grid item xs={9}>
+
+                        </Grid>
+                        <Grid item xs={3}>
+                            <Calendar EventData={userData['events']} />
+                        </Grid>
+                    </Grid>
+                </BackImage>
             ) : (
                 <p>Loading...</p>
             )}
