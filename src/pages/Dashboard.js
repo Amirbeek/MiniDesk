@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Calendar from "../components/Calendar";
-import Settings from "../components/Settings";
 import Navbar from "../components/Navbar";
 import styled from "styled-components";
 import {Grid} from "@mui/material";
@@ -34,6 +33,7 @@ const Dashboard = () => {
 
         fetchData();
     }, []);
+
 
     return (
         <div>

@@ -134,7 +134,7 @@ const   MyCalendar = () => {
                 setEventData((prevState) => [
                     ...prevState,
                     {
-                        _id: response.data.events._id,
+                        _id: response.data.eventId,
                         subject: event.subject,
                         description: event.description,
                         location: event.location,

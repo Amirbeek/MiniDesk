@@ -1,48 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
-
-const eventSchema = new mongoose.Schema({
-    subject: {
-        type: String,
-        required: true,
-        default: "No Title"
-    },
-    location: {
-        type: String,
-        default: "Not provided"
-    },
-    startTime: {
-        type: Date,
-        required: true
-    },
-    endTime: {
-        type: Date,
-        required: true
-    },
-    description: {
-        type: String,
-        default: ""
-    },
-    isAllDay: {
-        type: Boolean,
-        default: false
-    },
-    repeat: {
-        type: String,
-        enum: ['none', 'daily', 'weekly', 'monthly', 'yearly', 'custom'], // Define repeat types
-        default: 'none'
-    },
-    customRepeatInterval: {
-        type: Number, // Interval in days for custom repeat
-        default: null
-    },
-    timezone: {
-        type: String,
-        default: "UTC" // Default to UTC
-    }
-});
-
-
+const Schema = mongoose.Schema;
 const UserSchema = new mongoose.Schema(
     {
       username: { type: String, required: true, unique: true, minlength: 3 },
@@ -54,7 +12,7 @@ const UserSchema = new mongoose.Schema(
       isActive: { type: Boolean, default: false },
       activationToken: { type: String, default: null },
       resetPasswordToken: { type: String, default: null },
-      events: [eventSchema],
+        events: [{ type: Schema.Types.ObjectId, ref: 'Event' }]
     },
     { timestamps: true }
 );
