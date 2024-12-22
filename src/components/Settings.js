@@ -5,7 +5,8 @@ import "../style/MyCalendar.css";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import MenuItem from '@mui/material/MenuItem';
+
 const Header = styled.header`
     display: flex;
     justify-content: space-between;
@@ -15,14 +16,6 @@ const Header = styled.header`
     margin-bottom: 10px;
 `;
 
-const SettingButton = styled.a`
-    cursor: pointer;
-    background: rgba(255, 255, 255, 0.15);
-    width: 100%;
-    height: 100%;
-    padding: 17px 10px 8px 10px;
-    border-radius: 8px;
-`
 const Settings = ({ UserInfo }) => {
     const [open, setOpen] = useState(false);
     const navigate = useNavigate();
@@ -53,11 +46,10 @@ const Settings = ({ UserInfo }) => {
         }
     }
     return (
-        <div>
-            {/* Button to open the modal */}
-            <SettingButton  onClick={handleOpen}>
-                <SettingsOutlinedIcon/>
-            </SettingButton>
+        <>
+            <MenuItem  onClick={handleOpen}>
+                Account
+            </MenuItem>
             <Modal
                 open={open}
                 onClose={handleClose}
@@ -126,7 +118,7 @@ const Settings = ({ UserInfo }) => {
                     </Button>
                 </Box>
             </Modal>
-        </div>
+        </>
     );
 };
 

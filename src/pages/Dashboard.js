@@ -1,9 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Calendar from "../components/Calendar";
-import Navbar from "../components/Navbar";
+import NewNavbar from "../components/NewNavbar";
+import dayjs from 'dayjs';
+
+import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import styled from "styled-components";
-import {Grid} from "@mui/material";
+import { Grid } from "@mui/material";
+import TestCalendar from "../components/ButtonCalendar";
+
 const BackImage = styled.div`
     background: url("https://w0.peakpx.com/wallpaper/236/488/HD-wallpaper-mac-os-ventura-dark-macos-ventura-macbook-apple-computer.jpg") no-repeat center center;
     background-size: cover;
@@ -12,6 +19,7 @@ const BackImage = styled.div`
 
 const Dashboard = () => {
     const [userData, setUserData] = useState(null);
+    const [editMode, setEditMode] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -34,28 +42,26 @@ const Dashboard = () => {
         fetchData();
     }, []);
 
-
     return (
-        <div>
+        <BackImage>
             {userData ? (
-                <BackImage>
-                    <Navbar UserInfo={userData}/>
+                <>
+                    <NewNavbar UserInfo={userData} setEditMode={setEditMode} />
                     <Grid container spacing={2}>
-                        <Grid item xs={9}>
-
+                        <Grid item xs={12} sm={8}>
+                            {/* Main Content */}
                         </Grid>
-                        <Grid item xs={3}>
+                        <Grid item xs={12} sm={4}>
                             <Calendar EventData={userData['events']} />
                         </Grid>
                     </Grid>
-                </BackImage>
+
+                </>
             ) : (
-                <p>Loading...</p>
+                <span>Loading...</span>
             )}
-
-        </div>
+        </BackImage>
     );
-
 };
 
 export default Dashboard;

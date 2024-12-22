@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios"; // For making API calls
-
+import TestCalendar from "./ButtonCalendar";
 import "tui-calendar/dist/tui-calendar.css";
 import "../style/MyCalendar.css";
+import {registerLicense} from "@syncfusion/ej2-base";
+
 import {
     ScheduleComponent,
     Day,
@@ -16,6 +18,8 @@ import {
     DragAndDrop,
     Resize,
 } from "@syncfusion/ej2-react-schedule";
+registerLicense('Ngo9BigBOggjHTQxAR8/V1NMaF5cXmBCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWH1ccnRQQ2NdVkxzWUA=')
+
 
 // Styled components for the modal
 const ModalBackground = {
@@ -255,15 +259,11 @@ const   MyCalendar = () => {
             <button
                 onClick={handleOpen}
                 style={{
-                    padding: "10px",
-                    backgroundColor: "#007bff",
-                    color: "#fff",
-                    border: "none",
-                    borderRadius: "5px",
                     cursor: "pointer",
+                    backgroundColor:'transparent'
                 }}
             >
-                Open Calendar
+                <TestCalendar date={EventData}/>
             </button>
 
             {/* Custom Modal */}
