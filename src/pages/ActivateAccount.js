@@ -1,49 +1,8 @@
 import React, { useState } from 'react';
-import {useNavigate, useParams} from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import styled, { ThemeProvider } from 'styled-components';
 import { Button, Typography, CircularProgress, Box } from '@mui/material';
-import backgroundImage from '../backround_images/background.png';
-
-const theme = {
-    whiteColor: 'hsl(0, 0%, 100%)',
-    blackColor: 'hsl(0, 0%, 0%)',
-    borderColor: 'hsla(0, 0%, 100%, 0.7)',
-    backgroundBlur: 'hsla(0, 0%, 100%, 0.01)',
-    borderRadius: '1rem',
-};
-
-const Background = styled.div`
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: url(${backgroundImage}) no-repeat center center/cover;
-`;
-
-const ActivationContainer = styled(Box)`
-    background-color: ${(props) => props.theme.backgroundBlur};
-    border: 2px solid ${(props) => props.theme.borderColor};
-    padding: 2.5rem 1.5rem;
-    border-radius: ${(props) => props.theme.borderRadius};
-    backdrop-filter: blur(16px);
-    color: ${(props) => props.theme.whiteColor};
-    text-align: center;
-    max-width: 420px;
-    width: 100%;
-    @media (max-width: 600px) {
-        padding: 1rem;
-        max-width: 90%;
-        border: 0px;
-    }
-`;
-
-const StyledButton = styled(Button)`
-    background-color: ${(props) => props.theme.whiteColor} !important;
-    color: ${(props) => props.theme.blackColor} !important;
-    border-radius: ${(props) => props.theme.borderRadius};
-    font-weight: bold;
-`;
+import Navbar from "../sections/Navbar";
 
 const ActivateAccount = () => {
     const { token } = useParams();
@@ -57,7 +16,7 @@ const ActivateAccount = () => {
         try {
             const response = await axios.post(`http://localhost:5000/api/auth/activate/${token}`);
             setMessage(response.data.message);
-            navigate('/login')
+            navigate('/login');
         } catch (error) {
             setMessage(error.response?.data?.message || 'Activation failed');
         } finally {
@@ -66,28 +25,31 @@ const ActivateAccount = () => {
     };
 
     return (
-        <ThemeProvider theme={theme}>
-            <Background>
-                <ActivationContainer>
-                    <Typography variant="h4" gutterBottom>
+        <>
+            <Navbar/>
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh' }}>
+                <Box sx={{ padding: 3, border: '1px solid #ccc', borderRadius: 2, backgroundColor: '#fff', maxWidth: 400, width: '100%' }}>
+                    <Typography variant="h4" align="center" gutterBottom>
                         Activate Your Account
                     </Typography>
                     {loading ? (
-                        <CircularProgress style={{ color: theme.whiteColor }} />
+                        <CircularProgress sx={{ color: '#1976d2', display: 'block', margin: '0 auto' }} />
                     ) : (
-                        <StyledButton
+                        <Button
                             onClick={handleActivate}
                             variant="contained"
                             fullWidth
                             disabled={loading}
+                            sx={{ backgroundColor: '#1976d2', color: '#fff', borderRadius: 1, fontWeight: 'bold' }}
                         >
                             Activate Account
-                        </StyledButton>
+                        </Button>
                     )}
                     {message && (
                         <Typography
                             variant="body2"
-                            style={{
+                            align="center"
+                            sx={{
                                 marginTop: '1rem',
                                 color: message.includes('successfully') ? 'green' : 'red',
                             }}
@@ -95,9 +57,9 @@ const ActivateAccount = () => {
                             {message}
                         </Typography>
                     )}
-                </ActivationContainer>
-            </Background>
-        </ThemeProvider>
+                </Box>
+            </Box>
+        </>
     );
 };
 

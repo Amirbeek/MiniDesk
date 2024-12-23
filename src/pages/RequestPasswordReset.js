@@ -1,69 +1,10 @@
-import React, { useState } from 'react';
-import styled, { ThemeProvider } from 'styled-components';
+import React from 'react';
 import { TextField, Button, Grid, Typography, Box } from '@mui/material';
 import axios from 'axios';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import backgroundImage from '../backround_images/background.png';
-import {useNavigate} from "react-router-dom";
-
-const theme = {
-    whiteColor: 'hsl(0, 0%, 100%)',
-    blackColor: 'hsl(0, 0%, 0%)',
-    borderColor: 'hsla(0, 0%, 100%, 0.7)',
-    backgroundBlur: 'hsla(0, 0%, 100%, 0.01)',
-    borderRadius: '1rem',
-};
-
-const Background = styled.div`
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: url(${backgroundImage}) no-repeat center center/cover;
-`;
-
-const FormContainer = styled(Box)`
-    background-color: ${(props) => props.theme.backgroundBlur};
-    border: 2px solid ${(props) => props.theme.borderColor};
-    padding: 2.5rem 1.5rem;
-    border-radius: ${(props) => props.theme.borderRadius};
-    backdrop-filter: blur(16px);
-    color: ${(props) => props.theme.whiteColor};
-    max-width: 420px;
-    width: 100%;
-    @media (max-width: 600px) {
-        padding: 1rem;
-        max-width: 90%;
-        border: 0px;
-    }
-`;
-
-const StyledTextField = styled(TextField)`
-    & .MuiInputBase-input {
-        color: ${(props) => props.theme.whiteColor};
-    }
-    & .MuiOutlinedInput-root {
-        & fieldset {
-            border-color: ${(props) => props.theme.borderColor};
-        }
-        &:hover fieldset {
-            border-color: ${(props) => props.theme.whiteColor};
-        }
-    }
-    & .MuiInputLabel-root {
-        color: ${(props) => props.theme.whiteColor};
-    }
-`;
-
-const StyledError = styled.div`
-    color: red;
-    font-size: 0.8rem;
-    margin-top: 0.3rem;
-    @media (max-width: 600px) {
-        font-size: 0.7rem;
-    }
-`;
+import { useNavigate } from "react-router-dom";
+import Navbar from "../sections/Navbar";
 
 const RequestPasswordReset = () => {
     const navigate = useNavigate();
@@ -84,9 +25,10 @@ const RequestPasswordReset = () => {
     };
 
     return (
-        <ThemeProvider theme={theme}>
-            <Background>
-                <FormContainer>
+        <>
+        <Navbar/>
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh',  }}>
+                <Box sx={{ padding: 3, border: '1px solid #ccc', borderRadius: 2, backgroundColor: '#fff', maxWidth: 400, width: '100%' }}>
                     <Typography variant="h4" align="center" gutterBottom>
                         Reset Your Password
                     </Typography>
@@ -100,7 +42,7 @@ const RequestPasswordReset = () => {
                                 <Grid container spacing={2}>
                                     <Grid item xs={12}>
                                         <Field
-                                            as={StyledTextField}
+                                            as={TextField}
                                             fullWidth
                                             label="Email"
                                             variant="outlined"
@@ -109,7 +51,7 @@ const RequestPasswordReset = () => {
                                             onChange={handleChange}
                                             value={values.email}
                                         />
-                                        <ErrorMessage name="email" component={StyledError} />
+                                        <ErrorMessage name="email" component="div" style={{ color: 'red', fontSize: '0.8rem', marginTop: '0.3rem' }} />
                                     </Grid>
                                     <Grid item xs={12}>
                                         <Button
@@ -117,11 +59,7 @@ const RequestPasswordReset = () => {
                                             fullWidth
                                             variant="contained"
                                             disabled={isSubmitting}
-                                            style={{
-                                                backgroundColor: theme.whiteColor,
-                                                color: theme.blackColor,
-                                                borderRadius: theme.borderRadius,
-                                            }}
+                                            sx={{ backgroundColor: '#1976d2', color: '#fff', borderRadius: 1 }}
                                         >
                                             {isSubmitting ? 'Sending...' : 'Send Reset Link'}
                                         </Button>
@@ -129,8 +67,9 @@ const RequestPasswordReset = () => {
                                     <Grid item xs={12}>
                                         <Button
                                             variant="text"
-                                            style={{ color: theme.whiteColor }}
+                                            fullWidth
                                             onClick={() => navigate('/')}
+                                            sx={{ color: '#1976d2' }}
                                         >
                                             Go Back Home
                                         </Button>
@@ -139,9 +78,10 @@ const RequestPasswordReset = () => {
                             </Form>
                         )}
                     </Formik>
-                </FormContainer>
-            </Background>
-        </ThemeProvider>
+                </Box>
+            </Box>
+
+        </>
     );
 };
 

@@ -2,14 +2,8 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Calendar from "../components/Calendar";
 import NewNavbar from "../components/NewNavbar";
-import dayjs from 'dayjs';
-
-import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
-import { LocalizationProvider } from '@mui/x-date-pickers';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import styled from "styled-components";
 import { Grid } from "@mui/material";
-import TestCalendar from "../components/ButtonCalendar";
 
 const BackImage = styled.div`
     background: url("https://w0.peakpx.com/wallpaper/236/488/HD-wallpaper-mac-os-ventura-dark-macos-ventura-macbook-apple-computer.jpg") no-repeat center center;
@@ -48,13 +42,14 @@ const Dashboard = () => {
                 <>
                     <NewNavbar UserInfo={userData} setEditMode={setEditMode} />
                     <Grid container spacing={2}>
-                        <Grid item xs={12} sm={8}>
-                            {/* Main Content */}
+                        <Grid item xs={12} sm={4} md={8}>
+                            {/* MainSection Content */}
                         </Grid>
-                        <Grid item xs={12} sm={4}>
+                        <Grid item xs={12} sm={8} md={4}>
                             <Calendar EventData={userData['events']} />
                         </Grid>
                     </Grid>
+
 
                 </>
             ) : (
