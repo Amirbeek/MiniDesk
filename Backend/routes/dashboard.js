@@ -11,4 +11,11 @@ router.put('/event/:eventId', authenticate, dashboard.UpdateEvent);
 
 router.delete('/event/:eventId', authenticate, dashboard.DeleteEvent);
 
+router.post('/notes' ,authenticate, dashboard.PostNote)
+
+router.put('/notes/:noteId',authenticate, dashboard.PutNote)
+
+router.delete('/notes/:noteId',authenticate, dashboard.DeleteNote);
+
+
 module.exports = router;

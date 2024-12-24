@@ -1,18 +1,21 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const Schema = mongoose.Schema;
+
+
 const UserSchema = new mongoose.Schema(
     {
-      username: { type: String, required: true, unique: true, minlength: 3 },
-      email: { type: String, required: true, unique: true, lowercase: true, match: /.+\@.+\..+/ },
-      name: { type: String, required: true },
-      surname: { type: String, required: true },
-      country: { type: String, default: null },
-      password: { type: String, required: true, minlength: 8 },
-      isActive: { type: Boolean, default: false },
-      activationToken: { type: String, default: null },
-      resetPasswordToken: { type: String, default: null },
-        events: [{ type: Schema.Types.ObjectId, ref: 'Event' }]
+        username: { type: String, required: true, unique: true, minlength: 3 },
+        email: { type: String, required: true, unique: true, lowercase: true, match: /.+\@.+\..+/ },
+        name: { type: String, required: true },
+        surname: { type: String, required: true },
+        country: { type: String, default: null },
+        password: { type: String, required: true, minlength: 8 },
+        isActive: { type: Boolean, default: false },
+        activationToken: { type: String, default: null },
+        resetPasswordToken: { type: String, default: null },
+        events: [{ type: Schema.Types.ObjectId, ref: 'Event' }],
+        notes:[{type: Schema.Types.ObjectId, ref: 'Notes'}],
     },
     { timestamps: true }
 );

@@ -10,6 +10,7 @@ import Dashboard from "./pages/Dashboard";
 import { registerLicense } from '@syncfusion/ej2-base';
 import Note from "./components/Note";
 import Main from "./Main";
+import Test from "./components/NoteEditor";
 registerLicense('Ngo9BigBOggjHTQxAR8/V1NDaF1cX2hIfEx3RXxbf1x0ZFJMZVhbRX5PIiBoS35RckRhWXxfeXFRR2hUVUd+');
 
 function App() {

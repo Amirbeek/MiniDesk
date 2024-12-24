@@ -1,0 +1,5 @@
+ /*
+   *       Post: http://localhost:5000/api/notes
+   *       Put: http://localhost:5000/api/notes
+   *       Delete: http://localhost:5000/api/notes
+   * */

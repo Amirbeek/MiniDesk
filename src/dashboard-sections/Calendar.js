@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios"; // For making API calls
-import TestCalendar from "./ButtonCalendar";
+import axios from "axios";
+import TestCalendar from "../components/ButtonCalendar";
 import "tui-calendar/dist/tui-calendar.css";
 import "../style/MyCalendar.css";
 import {registerLicense} from "@syncfusion/ej2-base";
@@ -260,7 +260,9 @@ const   MyCalendar = () => {
                 onClick={handleOpen}
                 style={{
                     cursor: "pointer",
-                    backgroundColor:'transparent'
+                    backgroundColor:'transparent',
+                    padding:0,
+                    marginTop:15
                 }}
             >
                 <TestCalendar date={EventData}/>

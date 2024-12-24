@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
 const myEmail = process.env.My_Email;
 const password = process.env.MyPassword;
-
+const Note = require('../models/Notes');
 // this code has to be added for each controller methods
 // const errors = validationResult(req);
 // if (!errors.isEmpty()) {
@@ -34,11 +34,21 @@ exports.postSignup = async (req, res) => {
             country,
             password,
             isActive: false,
+
         });
 
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
         user.activationToken = token;
+
+        const defaultNote = new Note({
+            title: 'Your Node',
+            content:'',
+            creator: user._id,
+        })
+        user.notes.push(defaultNote);
+        await defaultNote.save();
         await user.save();
+
 
         await transport.sendMail({
             from: myEmail,

@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 // Middleware to verify the JWT token
 const authenticate = async (req, res, next) => {
     const authHeader = req.headers.authorization;
+    console.log('JWT TOKEN: ', authHeader);
     if (!authHeader) return res.status(401).json({ message: 'Authorization header is missing' });
     const token = authHeader.split(' ')[1]; // Assuming "Bearer <token>"
 
