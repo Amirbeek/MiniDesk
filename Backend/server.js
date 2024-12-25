@@ -1,13 +1,12 @@
-require('dotenv').config(); // Load environment variables at the top
-
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
-mongoose.set('debug', true);
-
 const bodyParser = require('body-parser');
 const authRoutes = require('./routes/auth');
 const cors = require("cors");
 const dashboard = require('./routes/dashboard');
+const auth2 =require('./auth2')
+require('./auth2')
 
 const app = express();
 
@@ -17,7 +16,9 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
-// Global error handling middleware
+app.use(bodyParser.json()); // For parsing application/json
+app.use(bodyParser.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
+
 app.use((error, req, res,next) => {
     console.log(error)
     const status = error.statusCode || 500;
@@ -45,11 +46,15 @@ const connectDB = async () => {
 };
 
 connectDB();
-app.use(bodyParser.json());
 
-// Routes
 app.use('/api/auth', authRoutes);
 app.use('/api', dashboard)
 
+
+app.get('/auth/google',auth2.AuthGoogle);
+app.get('/auth/google/callback', auth2.AuthGoogleCallBack);
+app.post('/auth/google', auth2.postAuth);
+
+
 const PORT = process.env.PORT || 5000;
-const server  = app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

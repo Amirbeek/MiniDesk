@@ -5,7 +5,8 @@ const Schema = mongoose.Schema;
 
 const UserSchema = new mongoose.Schema(
     {
-        username: { type: String, required: true, unique: true, minlength: 3 },
+        googleId: {type:String},
+        username: { type: String, unique: true, minlength: 3 },
         email: { type: String, required: true, unique: true, lowercase: true, match: /.+\@.+\..+/ },
         name: { type: String, required: true },
         surname: { type: String, required: true },
@@ -16,6 +17,7 @@ const UserSchema = new mongoose.Schema(
         resetPasswordToken: { type: String, default: null },
         events: [{ type: Schema.Types.ObjectId, ref: 'Event' }],
         notes:[{type: Schema.Types.ObjectId, ref: 'Notes'}],
+        todos: [{ type: Schema.Types.ObjectId, ref: 'Todos' }]
     },
     { timestamps: true }
 );

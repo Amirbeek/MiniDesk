@@ -49,7 +49,7 @@ function DrawerAppBar(props) {
             <CssBaseline />
             <AppBar
                 component="nav"
-                sx={{ backgroundColor: 'transparent', boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)' }}
+                sx={{ backgroundColor: '#fff', boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)' }}
             >
                 <Toolbar>
                     <IconButton

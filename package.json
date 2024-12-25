@@ -12,6 +12,7 @@
     "@mui/lab": "^6.0.0-beta.20",
     "@mui/material": "^6.3.0",
     "@mui/x-date-pickers": "^7.23.3",
+    "@react-oauth/google": "^0.12.1",
     "@syncfusion/ej2-base": "^27.2.5",
     "@syncfusion/ej2-react-schedule": "^27.2.5",
     "array-move": "^4.0.0",

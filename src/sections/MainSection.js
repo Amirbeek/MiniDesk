@@ -1,30 +1,59 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import AnimatedSection from '../components/AnimatedSection';
 import { Grid } from "@mui/material";
+import Bimage from '../backround_images/Bimage.png'; // Import image
+import { useNavigate } from 'react-router-dom';  // Import useNavigate for redirection
+
+const GoogleButtonStyle = styled.div`
+    display: flex;
+    justify-content: center;
+    height: 100px;
+    width: 300px;
+
+    .nsm7Bb-HzV7m-LgbsSe-MJoBVe{
+
+    }
+    .google-sign-in-button {
+
+        .nsm7Bb-HzV7m-Bz112c{
+            display: none;
+        }
+
+        span {
+            padding: 10px;
+            font-weight: bolder;
+            font-size: 20px;
+            color: #5e17eb;
+            gap: 6px;
+            border: 2px solid #5e17eb;
+            border-radius: 0px;
+            transition-duration: .3s;
+            &:hover {
+                background-color: #5e17eb;
+                color: #fff;
+            }
+        }
+    }
+`;
 
 const AboutContainer = styled.div`
     padding: 100px 100px;
     text-align: left;
-
+    .nsm7Bb-HzV7m-LgbsSe{
+        width: 100%;
+        padding: 0;
+        height: 100%;
+    }
     h1 {
         color: #000;
         line-height: 72px;
-        margin-top: 18px;
+        margin-top: 18px;margin-bottom: 10px;
         font-size: 60px;
         font-weight: 700;
         span {
             color: #5e17eb;
         }
     }
-
-    p {
-        font-size: 1.2rem;
-        max-width: 800px;
-        line-height: 1.6;
-        font-weight: 700;
-    }
-
     @media (max-width: 768px) {
         padding: 40px 20px;
 
@@ -32,19 +61,13 @@ const AboutContainer = styled.div`
             font-size: 36px;
             line-height: 1.1;
         }
-
-        p {
-            font-size: 0.9rem;
-        }
     }
-`;
-
-const FaceColor = styled.span`
-    color: ${props => props.theme.primary_color} !important;
 `;
 
 const About = () => {
     const [currentText, setCurrentText] = useState("design");
+    const googleButtonRef = useRef(null);
+    const navigate = useNavigate();  // Initialize useNavigate for redirecting
 
     useEffect(() => {
         const texts = ["Organize", "Create", "Manage"];
@@ -57,24 +80,64 @@ const About = () => {
         return () => clearInterval(interval);
     }, []);
 
+    useEffect(() => {
+        /* global google */
+        if (window.google && googleButtonRef.current) {
+            window.google.accounts.id.initialize({
+                client_id: '431778205050-cjiijts61qdaof3a78eaufbf7pk8dpia.apps.googleusercontent.com',
+                callback: (response) => {
+                    const { credential } = response;
+                    console.log('Google credential:', credential);
+
+                    // Call your API to handle login with the credential
+                    fetch(`http://localhost:5000/auth/google`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ token: credential }),
+                    })
+                        .then((res) => res.json())
+                        .then((data) => {
+                            console.log('Login successful:', data);
+
+                            // Save the JWT token in localStorage
+                            localStorage.setItem('token', data.token);
+
+                            // Redirect to the dashboard page
+                            navigate('/dashboard');
+                        })
+                        .catch((error) => {
+                            console.error('Login failed:', error);
+                        });
+                },
+            });
+
+            window.google.accounts.id.renderButton(googleButtonRef.current, {
+                theme: 'outline',
+                size: 'large',
+                text: 'continue_with',
+                width: 300,
+            });
+        }
+    }, [navigate]);
+
     return (
-        <AnimatedSection >
-            <Grid container spacing={2} >
-                <Grid item xs={12} md={6}>
-                    <AboutContainer>
-                        <h1>
-                            Welcome to MiniDesk
-                            <br />
-                            <FaceColor>{currentText}</FaceColor> your productivity companion
-                        </h1>
-                    </AboutContainer>
-                </Grid>
-                <Grid item xs={12} md={6}>
-                    {/* Placeholder for image or additional content */}
-                    <img src={require('../backround_images/Bimage.png')} alt="Mini Desk Overview" style={{ width: '100%', borderRadius: '10px' }} />
-                </Grid>
+        <Grid container spacing={2}>
+            <Grid item xs={12} md={6}>
+                <AboutContainer>
+                    <h1>
+                        Welcome to MiniDesk
+                        <br />
+                        <span style={{ color: '#5e17eb' }}>{currentText}</span> your productivity companion
+                    </h1>
+                    <GoogleButtonStyle>
+                        <div className="google-sign-in-button" ref={googleButtonRef}></div>
+                    </GoogleButtonStyle>
+                </AboutContainer>
             </Grid>
-        </AnimatedSection>
+            <Grid item xs={12} md={6}>
+                <img src={Bimage} alt="Mini Desk Overview" style={{ width: '100%', borderRadius: '10px' }} />
+            </Grid>
+        </Grid>
     );
 };
 

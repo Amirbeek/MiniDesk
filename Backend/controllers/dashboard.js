@@ -7,11 +7,13 @@ exports.getUserInfo = async (req, res) => {
         const userId = req.user.userId;
         const user = await User.findById(userId)
             .populate('events')
-            .populate('notes');
+            .populate('todos')
+            .populate('notes')
+            .lean();
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
-
+        console.log('TODOS: ', user.todos)
 
         res.status(200).json({
             message: 'Welcome to your dashboard',
@@ -23,10 +25,11 @@ exports.getUserInfo = async (req, res) => {
                 country: user.country,
                 events: user.events,
                 notes: user.notes,
+                todos: user.todos
             },
         });
     } catch (err) {
-        console.error('Error fetching user info:', err); // Log the error for debugging
+        console.error('Error fetching user info:', err);
         res.status(500).json({ message: 'Error fetching dashboard data', error: err.message });
     }
 };
@@ -128,11 +131,6 @@ exports.DeleteEvent = async (req, res) => {
         res.status(e.statusCode || 500).json({ message: e.message || 'Error deleting event' });
     }
 };
-
-
-
-
-
 exports.PostNote = async function (req, res) {
     try {
         const userId = req.user.userId;
@@ -167,7 +165,6 @@ exports.PostNote = async function (req, res) {
         res.status(500).json({ message: "Error creating note", error: err });
     }
 };
-
 exports.PutNote = async function (req, res) {
     try {
         const userId = req.user.userId;
@@ -195,7 +192,6 @@ exports.PutNote = async function (req, res) {
         res.status(500).json({ message: 'Error updating Note', error: e.message });
     }
 };
-
 exports.DeleteNote = async function (req, res) {
     try {
         const userId = req.user.userId;
