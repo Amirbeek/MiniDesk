@@ -62,10 +62,7 @@ const Dashboard = () => {
                             </Grid>
                             <Calendar EventData={userData['events']} />
                         </Grid>
-                        {/*<NotesWindow/>*/}
                     </Grid>
-
-                    {/*<HorizontalScrollBox/>*/}
                 </>
             ) : (
                 <span>Loading...</span>

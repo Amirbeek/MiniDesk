@@ -5,20 +5,25 @@ import NotesWindow from "../components/NotesWindow";
 
 function Note({notesData}) {
     const [open, setOpen] = useState(false);
-    const [notes, setNotes] = useState(notesData);
-    const [selectedNote, setSelectedNote] = useState([notesData[0]._id] || null);
-
     const handleClickOpen = () => {
         setOpen(true);
     };
 
-    const Component_data = <>
-        {notesData.map((note, index) => (
-            <>
-                <span key={index}>{note.title}</span> <br/>
-            </>
-        ))}
-    </>
+    const Component_data = (
+        <>
+            {notesData.slice(0, 4).map((note, index) => (
+                <>
+                    <span key={index}>{note.title}</span><br/>
+                </>
+            ))}
+            {notesData.length > 4 && (
+                <span style={{  cursor: "pointer" }}>
+                ...and {notesData.length - 5} more
+            </span>
+            )}
+        </>
+    );
+
 
     return (
         <div>

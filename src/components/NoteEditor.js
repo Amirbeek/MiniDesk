@@ -1,6 +1,6 @@
-import React, { useRef } from 'react';
-import { Editor, EditorState, RichUtils } from 'draft-js';
-import styled from 'styled-components';
+import React, { useRef } from "react";
+import { Editor, EditorState, RichUtils } from "draft-js";
+import styled from "styled-components";
 
 const EditorWrapper = styled.div`
     border: 1px solid rgb(255, 255, 255);
@@ -12,6 +12,7 @@ const EditorControls = styled.div`
     display: flex;
     justify-content: flex-start;
     font-size: 14px;
+    
 `;
 
 const ContentEditor = styled.div`
@@ -25,18 +26,21 @@ const ContentEditor = styled.div`
 `;
 
 const StyleButton = styled.button`
-    padding: 0px 10px;
+    padding: 10px 10px;
     font-size: 14px;
     cursor: pointer;
-    background-color: ${(props) => (props.active ? '#fff' : '#fff')};
-    color: ${(props) => (props.active ? '#e77f23' : '#666')};
-    font-weight: ${(props) => (props.active ? 'bold' : 'normal')};
+    background-color: ${(props) => (props.active ? "#fff" : "#fff")};
+    color: ${(props) => (props.active ? "#e77f23" : "#666")};
+    font-weight: ${(props) => (props.active ? "bold" : "normal")};
+    &:hover{
+        background-color: #fff;
+        
+    }
 `;
 
 const RichEditor = ({ editorState, setEditorState }) => {
     const editorRef = useRef(null);
 
-    // Focus editor
     const focus = () => {
         if (editorRef.current) {
             editorRef.current.focus();
@@ -49,13 +53,13 @@ const RichEditor = ({ editorState, setEditorState }) => {
 
     const toggleBlockType = (blockType) => {
         const blockTypes = {
-            'H1': 'header-one',
-            'H2': 'header-two',
-            'H3': 'header-three',
-            'UL': 'unordered-list-item',
-            'OL': 'ordered-list-item',
-            'Blockquote': 'blockquote',
-            'code-block': 'code-block'
+            H1: "header-one",
+            H2: "header-two",
+            H3: "header-three",
+            UL: "unordered-list-item",
+            OL: "ordered-list-item",
+            Blockquote: "blockquote",
+            "code-block": "code-block",
         };
         setEditorState(RichUtils.toggleBlockType(editorState, blockTypes[blockType]));
     };
@@ -67,10 +71,15 @@ const RichEditor = ({ editorState, setEditorState }) => {
     return (
         <EditorWrapper>
             <EditorControls>
-                {['H1', 'H2', 'H3', 'Blockquote', 'UL', 'OL', 'code-block'].map((blockType) => (
+                {["H1", "H2", "H3", "Blockquote", "UL", "OL", "code-block"].map((blockType) => (
                     <StyleButton
                         key={blockType}
-                        active={editorState.getCurrentContent().getBlockForKey(editorState.getSelection().getStartKey()).getType() === blockType.toLowerCase()}
+                        active={
+                            editorState
+                                .getCurrentContent()
+                                .getBlockForKey(editorState.getSelection().getStartKey())
+                                .getType() === blockType.toLowerCase()
+                        }
                         onClick={() => toggleBlockType(blockType)}
                     >
                         {blockType}
@@ -78,7 +87,7 @@ const RichEditor = ({ editorState, setEditorState }) => {
                 ))}
             </EditorControls>
             <EditorControls>
-                {['BOLD', 'ITALIC', 'UNDERLINE', 'CODE'].map((inlineStyle) => (
+                {["BOLD", "ITALIC", "UNDERLINE", "CODE"].map((inlineStyle) => (
                     <StyleButton
                         key={inlineStyle}
                         active={editorState.getCurrentInlineStyle().has(inlineStyle)}

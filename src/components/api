@@ -3,3 +3,10 @@
    *       Put: http://localhost:5000/api/notes
    *       Delete: http://localhost:5000/api/notes
    * */
+
+
+/*
+   *       Post: http://localhost:5000/api/todos
+   *       Put: http://localhost:5000/api/todos
+   *       Delete: http://localhost:5000/api/todos
+   * */
