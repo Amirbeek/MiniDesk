@@ -24,3 +24,4 @@ yarn-error.log*
 Backend/.env
 Backend/.env
 .env
+.env
