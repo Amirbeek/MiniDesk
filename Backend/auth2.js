@@ -1,93 +1,121 @@
-const passport = require("passport");
-const { Strategy: GoogleStrategy } = require("passport-google-oauth20");
-const User = require("./models/User");
-const Note = require("./models/Notes");
-const Todos = require("./models/Todos");
-const jwt = require("jsonwebtoken");
+    const { OAuth2Client } = require('google-auth-library');
+    const express = require('express');
+    const router = express.Router();
+    const dotenv = require('dotenv');
+    const fetch = require('node-fetch');
+    const jwt = require('jsonwebtoken'); // Import the JWT library
+    const User = require('./models/User');
+    const Note = require("./models/Notes");
+    const Todos = require("./models/Todos"); // Import the User model
+    dotenv.config();
 
-passport.use(new GoogleStrategy(
-    {
-        clientID: process.env.GOOGLE_CLIENT_ID,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: process.env.CLIENT_URL + "/google/callback",
-        passReqToCallback: true,
-    },
-    async (request, accessToken, refreshToken, profile, done) => {
+
+    router.get('/request', (req, res) => {
+        const redirectUrl = 'http://localhost:5000/oauth';
+        // const redirectUrl = 'http://localhost:3000/dashboard';
+
+        const oAuth2Client = new OAuth2Client(
+            process.env.GOOGLE_CLIENT_ID,
+            process.env.GOOGLE_CLIENT_SECRET,
+            redirectUrl
+        );
+        const authorizeUrl = oAuth2Client.generateAuthUrl({
+            access_type: 'offline',
+            scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email openid', // Added email scope
+            prompt: 'consent',
+        });
+
+        res.json({ url: authorizeUrl });
+    });
+
+    router.get('/oauth', async (req, res) => {
+        const { code } = req.query;
+        if (!code) {
+            return res.status(400).json({ message: 'Authorization code is missing' });
+        }
+
         try {
-            let user = await User.findOne({ googleId: profile.id });
+            const redirectUrl = 'http://localhost:5000/oauth'; // Your redirect URL
+            const oAuth2Client = new OAuth2Client(
+                process.env.GOOGLE_CLIENT_ID,
+                process.env.GOOGLE_CLIENT_SECRET,
+                redirectUrl
+            );
 
-            if (!user) {
-                user = new User({
-                    googleId: profile.id,
-                    email: profile.emails[0].value,
-                    name: profile.displayName,
-                    username: profile.emails[0].value,  // Use Google email as username
-                    isActive: true,  // Assuming Google login directly activates the account
+            const { tokens } = await oAuth2Client.getToken(code);
+            oAuth2Client.setCredentials(tokens);
+
+            const userData = await getUserData(oAuth2Client);
+            let existingUser = await User.findOne({ googleId: userData.id });
+            console.log("Check User ID: " + userData);
+
+            let token;
+
+            if (existingUser) {
+                token = jwt.sign(
+                    { userId: existingUser._id },
+                    process.env.JWT_SECRET,
+                    { expiresIn: '1h' }
+                );
+            } else {
+                const newUser = new User({
+                    googleId: userData.id,
+                    username: userData.email,
+                    email: userData.email,
+                    name: userData.given_name,
+                    surname: userData.family_name,
+                    country: null,
+                    password: 'googleOAuth',  // You can customize how the password is stored
+                    isActive: true,
                 });
-
-                // Create default note and todos
                 const defaultNote = new Note({
                     title: 'Your Node',
-                    content: [],
-                    creator: user._id,
-                });
-                user.notes.push(defaultNote);
+                    content:[],
+                    creator: newUser._id,
+                })
+                newUser.notes.push(defaultNote);
                 await defaultNote.save();
+
 
                 const defaultTodo = new Todos({
                     title: 'Your Todo',
-                    creator: user._id,
+                    creator: newUser._id,
                     todos: [
                         { text: 'Set up your first task', done: false },
                         { text: 'Complete your first todo item', done: false },
-                        { text: 'Explore the platform features', done: false },
-                    ],
+                        { text: 'Explore the platform features', done: false }
+                    ]
                 });
-                user.todos.push(defaultTodo);
+                newUser.todos.push(defaultTodo);
                 await defaultTodo.save();
+                await newUser.save();
 
-                await user.save();
+                token = jwt.sign(
+                    { userId: newUser._id },
+                    process.env.JWT_SECRET,
+                    { expiresIn: '1h' }
+                );
             }
 
-            // Generate JWT token for the user
-            const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+            // Redirect to frontend with the token in the URL
+            res.redirect(`http://localhost:3000?token=${token}`);
 
-            return done(null, { user, token });
         } catch (err) {
-            return done(err,'Hello world ami');
+            console.error('Error during OAuth callback:', err);
+            res.status(500).json({ message: 'Authentication failed', error: err.message });
         }
-    }
-));
-
-exports.AuthGoogle = passport.authenticate('google', {
-    scope: ['profile', 'email'],
-});
-
-exports.AuthGoogleCallBack = passport.authenticate('google', { failureRedirect: '/login' }),
-    (req, res) => {
-        const { user, token } = req.user;
-
-        // Send back the user data and JWT token
-        return res.status(200).json({
-            message: 'Google login successful',
-            token: token,
-            user: user,
-        });
-    };
-
-exports.postAuth = passport.authenticate('google', {
-    session: false,  // Use sessionless authentication if you're not maintaining sessions
-    failureRedirect: '/login',  // Redirect to /login if authentication fails
-}), (req, res) => {
-    // This code will only run if Google authentication is successful
-    console.log('User authenticated:', req.user);
-
-    // Generate JWT token for the user
-    const token = jwt.sign({ userId: req.user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
-
-    // Send the response with the token and user data
-    res.json({
-        token,
-        user: req.user,
     });
-};
+
+
+    async function getUserData(oAuth2Client) {
+        const response = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+            headers: {
+                Authorization: `Bearer ${oAuth2Client.credentials.access_token}`,
+            },
+        });
+        const data = await response.json();
+        console.log('User Data:', data);
+        return data;
+    }
+
+    module.exports = router;

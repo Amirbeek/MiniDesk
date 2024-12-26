@@ -18,7 +18,6 @@ const LoginForm = () => {
 
     const handleSubmit = async (values, { setSubmitting }) => {
         try {
-            alert(values.username_or_email);
             const response = await axios.post('http://localhost:5000/api/auth/login', values);
             toast.success(response.data.message);
             navigate('/dashboard');

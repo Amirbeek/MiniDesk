@@ -205,20 +205,15 @@ exports.resendActivationEmail = async (req, res) => {
     const { email } = req.body;
     try {
         const user = await User.findOne({ email });
-
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
-
         if (user.isActive) {
             return res.status(400).json({ message: 'Your account is already activated' });
         }
-
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
-
         user.activationToken = token;
         await user.save();
-
         await transport.sendMail({
             from: myEmail,
             to: email,

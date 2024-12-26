@@ -12,7 +12,7 @@ const app = express();
 
 app.use(cors({
     origin: '*',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
@@ -49,11 +49,8 @@ connectDB();
 
 app.use('/api/auth', authRoutes);
 app.use('/api', dashboard)
+app.use( auth2);
 
-
-app.get('/auth/google',auth2.AuthGoogle);
-app.get('/auth/google/callback', auth2.AuthGoogleCallBack);
-app.post('/auth/google', auth2.postAuth);
 
 
 const PORT = process.env.PORT || 5000;
