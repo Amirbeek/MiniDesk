@@ -1,6 +1,7 @@
 import React, { useRef } from "react";
 import { Editor, EditorState, RichUtils } from "draft-js";
 import styled from "styled-components";
+import DialogTitle from "./widget_component/DiaglogTitle";
 
 const EditorWrapper = styled.div`
     border: 1px solid rgb(255, 255, 255);
@@ -26,7 +27,7 @@ const ContentEditor = styled.div`
 `;
 
 const StyleButton = styled.button`
-    padding: 10px 10px;
+    padding: 5px 10px;
     font-size: 14px;
     cursor: pointer;
     background-color: ${(props) => (props.active ? "#fff" : "#fff")};
@@ -37,8 +38,11 @@ const StyleButton = styled.button`
         
     }
 `;
+const EditorControllers = styled.div`
+    //position: absolute;
 
-const RichEditor = ({ editorState, setEditorState }) => {
+`
+const RichEditor = ({ editorState, setEditorState ,title}) => {
     const editorRef = useRef(null);
 
     const focus = () => {
@@ -70,34 +74,37 @@ const RichEditor = ({ editorState, setEditorState }) => {
 
     return (
         <EditorWrapper>
-            <EditorControls>
-                {["H1", "H2", "H3", "Blockquote", "UL", "OL", "code-block"].map((blockType) => (
-                    <StyleButton
-                        key={blockType}
-                        active={
-                            editorState
-                                .getCurrentContent()
-                                .getBlockForKey(editorState.getSelection().getStartKey())
-                                .getType() === blockType.toLowerCase()
-                        }
-                        onClick={() => toggleBlockType(blockType)}
-                    >
-                        {blockType}
-                    </StyleButton>
-                ))}
-            </EditorControls>
-            <EditorControls>
-                {["BOLD", "ITALIC", "UNDERLINE", "CODE"].map((inlineStyle) => (
-                    <StyleButton
-                        key={inlineStyle}
-                        active={editorState.getCurrentInlineStyle().has(inlineStyle)}
-                        onClick={() => toggleInlineStyle(inlineStyle)}
-                    >
-                        {inlineStyle}
-                    </StyleButton>
-                ))}
-            </EditorControls>
-            <ContentEditor onClick={focus}>
+            <EditorControllers>
+                <DialogTitle>{title}</DialogTitle>
+                <EditorControls>
+                    {["H1", "H2", "H3", "Blockquote", "UL", "OL", "code-block"].map((blockType) => (
+                        <StyleButton
+                            key={blockType}
+                            active={
+                                editorState
+                                    .getCurrentContent()
+                                    .getBlockForKey(editorState.getSelection().getStartKey())
+                                    .getType() === blockType.toLowerCase()
+                            }
+                            onClick={() => toggleBlockType(blockType)}
+                        >
+                            {blockType}
+                        </StyleButton>
+                    ))}
+                </EditorControls>
+                <EditorControls>
+                    {["BOLD", "ITALIC", "UNDERLINE", "CODE"].map((inlineStyle) => (
+                        <StyleButton
+                            key={inlineStyle}
+                            active={editorState.getCurrentInlineStyle().has(inlineStyle)}
+                            onClick={() => toggleInlineStyle(inlineStyle)}
+                        >
+                            {inlineStyle}
+                        </StyleButton>
+                    ))}
+                </EditorControls>
+            </EditorControllers>
+            <ContentEditor onClick={focus} >
                 <Editor
                     ref={editorRef}
                     editorState={editorState}

@@ -2,7 +2,7 @@ import React from 'react';
 import styled, { ThemeProvider } from 'styled-components';
 import { Button, Grid } from '@mui/material';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate hook
-import backgroundImage from '../backround_images/background.png';
+import backgroundImage from '../background_images/background.png';
 
 // Define a theme with your color variables
 const theme = {

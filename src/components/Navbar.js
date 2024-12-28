@@ -108,7 +108,6 @@ export default function Navbar({ UserInfo, setEditMode }) {
                         <StyledInputBase placeholder="Search…" inputProps={{ 'aria-label': 'search' }} />
                     </Search>
                     <Box sx={{ flexGrow: 1 }} />
-                    {/* Settings Icon and Dropdown Menu */}
                     <SettingButton onClick={handleSettingsClick}>
                         <SettingsOutlinedIcon />
                     </SettingButton>

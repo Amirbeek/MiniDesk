@@ -1,39 +1,39 @@
-import React, { useState, forwardRef, useEffect, useCallback } from "react";
-import debounce from "lodash.debounce"; // Import debounce function
+import React, { useState, forwardRef } from "react";
+import debounce from "lodash.debounce";
 import {
     Dialog,
-    DialogTitle,
     DialogContent,
-    DialogActions,
-    Button,
-    Menu,
-    List,
     ListItem,
     Divider,
-    IconButton,
-    SvgIcon,
-    MenuItem,
     TextField,
-    CircularProgress
+    CircularProgress,
 } from "@mui/material";
-import { X, Plus, XCircle } from "react-feather";
+import { XCircle } from "react-feather";
 import { EditorState, ContentState, convertToRaw, convertFromRaw } from "draft-js";
-import RichEditor from "./NoteEditor"; // Your RichEditor component
+import RichEditor from "./NoteEditor"; // Assuming you have a RichEditor component
 import styled from "styled-components";
+import AddNew from "./widget_component/AddNew";
+import DialogHeader from "./widget_component/DialogHeader";
+import UnSelected from "./widget_component/UnSelected";
+import DialogListContainer from "./widget_component/DialogListContainer";
+import DialogDetailsContainer from "./widget_component/DialogDetailsContainer";
+import ContextMenu from "./widget_component/ContextMenu";
 
-const UnSelected = styled.div`
-    height: 60vh;
-`;
 const StyledListItem = styled(ListItem)`
-    padding: 10px 10px!important;
     cursor: pointer;
     border-radius: 5px;
-`
+    margin-bottom: 5px;
+    &:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+`;
 const ListWrapper = styled.div`
     padding: 5px 5px 5px 0;
     border-bottom: 1px solid #e1dcdc;
+`;
 
-`
+
+
 
 const NotesWindow = forwardRef(({ open, setOpen, NoteData }, ref) => {
     const [notes, setNotes] = useState(NoteData);
@@ -43,10 +43,10 @@ const NotesWindow = forwardRef(({ open, setOpen, NoteData }, ref) => {
     const [editingTitle, setEditingTitle] = useState(false);
     const [newTitle, setNewTitle] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+
     const debouncedSaveNote = debounce(async (newEditorState) => {
         if (!selectedNote) return;
         const rawContent = convertToRaw(newEditorState.getCurrentContent());
-
         const updatedNote = {
             ...selectedNote,
             content: rawContent,
@@ -54,7 +54,6 @@ const NotesWindow = forwardRef(({ open, setOpen, NoteData }, ref) => {
         };
 
         const token = localStorage.getItem('authToken');
-
         try {
             const response = await fetch(`http://localhost:5000/api/notes/${selectedNote._id}`, {
                 method: 'PUT',
@@ -66,13 +65,11 @@ const NotesWindow = forwardRef(({ open, setOpen, NoteData }, ref) => {
             });
 
             const data = await response.json();
-
             if (response.ok) {
-                // Update the note in the local state after successful save
                 const updatedNotes = notes.map((note) =>
                     note._id === selectedNote._id ? updatedNote : note
                 );
-                setNotes(updatedNotes); // Update the local state with the new content
+                setNotes(updatedNotes);
             } else {
                 console.error('Error:', data.message || 'Error saving note');
             }
@@ -84,11 +81,10 @@ const NotesWindow = forwardRef(({ open, setOpen, NoteData }, ref) => {
     const handleClose = () => setOpen(false);
 
     const handleAddNote = async () => {
-        setIsLoading(true);  // Show loading indicator
+        setIsLoading(true);
         const newNote = { title: "New Note", content: editorState.getCurrentContent() };
 
         const token = localStorage.getItem('authToken');
-
         try {
             const response = await fetch('http://localhost:5000/api/notes', {
                 method: 'POST',
@@ -110,7 +106,7 @@ const NotesWindow = forwardRef(({ open, setOpen, NoteData }, ref) => {
         } catch (error) {
             console.error('Error adding note:', error);
         } finally {
-            setIsLoading(false);  // Hide loading indicator
+            setIsLoading(false);
         }
     };
 
@@ -118,30 +114,23 @@ const NotesWindow = forwardRef(({ open, setOpen, NoteData }, ref) => {
         setSelectedNote(note);
 
         let contentState;
-
         if (note.content && note.content.blocks && Array.isArray(note.content.blocks)) {
-            // Ensure `content.entityMap` is present and is an object
             const content = note.content;
             const rawContent = {
                 blocks: content.blocks,
-                entityMap: content.entityMap || {} // Use an empty object if entityMap is missing
+                entityMap: content.entityMap || {}
             };
 
             try {
-                // Attempt to convert the raw content to Draft.js content state
                 contentState = convertFromRaw(rawContent);
             } catch (error) {
                 console.error('Error converting raw content:', error);
-                // Fallback to empty content if conversion fails
-                contentState = ContentState.createFromText('');  // Empty content
+                contentState = ContentState.createFromText('');
             }
         } else {
-            console.warn('Invalid content structure for note:', note._id);
-            // Fallback to empty content if structure is invalid
-            contentState = ContentState.createFromText('');  // Empty content
+            contentState = ContentState.createFromText('');
         }
 
-        // Set the editor state with the validated content
         setEditorState(EditorState.createWithContent(contentState));
     };
 
@@ -149,30 +138,14 @@ const NotesWindow = forwardRef(({ open, setOpen, NoteData }, ref) => {
         setMousePos({ mouseX: e.clientX - 2, mouseY: e.clientY - 4 });
         e.preventDefault();
     };
-
-    useEffect(() => {
-        const handleKeyDown = (event) => {
-            if (event.key === 'Enter' && selectedNote) {
-                handleTitleSave();
-            }
-        };
-
-        window.addEventListener("keydown", handleKeyDown);
-
-        return () => {
-            window.removeEventListener("keydown", handleKeyDown);
-        };
-    }, [selectedNote, newTitle]);
-
     const handleDeleteNote = async () => {
         if (!selectedNote || !selectedNote._id) {
             console.error('No note selected or note ID is missing');
             return;
         }
 
-        setIsLoading(true);  // Show loading indicator
+        setIsLoading(true);
         const token = localStorage.getItem('authToken');
-
         try {
             const response = await fetch(`http://localhost:5000/api/notes/${selectedNote._id}`, {
                 method: 'DELETE',
@@ -201,10 +174,9 @@ const NotesWindow = forwardRef(({ open, setOpen, NoteData }, ref) => {
         } catch (error) {
             console.error('Error deleting note:', error);
         } finally {
-            setIsLoading(false);  // Hide loading indicator
+            setIsLoading(false);
         }
     };
-
     const handleTitleDoubleClick = (note) => {
         if (selectedNote._id === note._id) {
             setEditingTitle(true);
@@ -249,100 +221,80 @@ const NotesWindow = forwardRef(({ open, setOpen, NoteData }, ref) => {
 
     return (
         <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">
-            <DialogTitle>
-                Notes Widget
-                <IconButton
-                    aria-label="close"
-                    onClick={handleClose}
-                    size="small"
-                    sx={{
-                        position: 'absolute',
-                        right: 10,
-                        top: 10,
-                        margin: '8px',
-                    }}
-                >
-                    <SvgIcon>
-                        <X />
-                    </SvgIcon>
-                </IconButton>
-            </DialogTitle>
+            <DialogHeader title="Note Widget" onClose={handleClose} />
             <DialogContent>
-                <div style={{ display: "flex" }}>
-                    <List style={{ width: "30%", borderRight: "1px solid #ddd" , paddingRight: '10px'}}>
-                        {notes.map((note) => (
-                            <ListWrapper>
-                                <StyledListItem
-                                    key={note._id}
-                                    button
-                                    selected={note._id === selectedNote?._id}
-                                    onClick={() => handleSelectNote(note)}
-                                    onContextMenu={(e) => handleContextMenu(e, note._id)}
-                                    onDoubleClick={() => handleTitleDoubleClick(note)}
-                                    sx={{
-                                        backgroundColor: note._id === selectedNote?._id ? 'rgba(0, 0, 0, 0.08)' : 'transparent',
-                                        color: note._id === selectedNote?._id ? '#000' : 'inherit',
-
-                                    }}
-                                >
-                                    {editingTitle && selectedNote._id === note._id ? (
-                                        <div>
-                                            <TextField
-                                                variant="standard"
-                                                type="text"
-                                                value={newTitle}
-                                                onChange={handleTitleChange}
-                                                onBlur={handleTitleSave}
-                                                autoFocus
-                                                fullWidth
-                                            />
-
-                                        </div>
-                                    ) : (
-                                        note.title
-                                    )}
-                                </StyledListItem>
-                            </ListWrapper>
-                        ))}
-                        <Divider />
-                        <span onClick={handleAddNote} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', position: "absolute", bottom: "10px" }}>
-                            <Plus style={{ marginRight: '8px' }} />
+                < div style={{display: "flex"}}>
+                        <DialogListContainer >
+                            {notes.map((note) => (
+                                <ListWrapper>
+                                    <StyledListItem
+                                        key={note._id}
+                                        button
+                                        selected={note._id === selectedNote?._id}
+                                        onClick={() => handleSelectNote(note)}
+                                        onContextMenu={(e) => handleContextMenu(e, note._id)}
+                                        onDoubleClick={() => handleTitleDoubleClick(note)}
+                                        sx={{
+                                            backgroundColor: note._id === selectedNote?._id ? 'rgba(0, 0, 0, 0.08)' : 'transparent',
+                                            color: note._id === selectedNote?._id ? '#000' : 'inherit',
+                                        }}
+                                    >
+                                        {editingTitle && selectedNote._id === note._id ? (
+                                                <TextField
+                                                    variant="standard"
+                                                    type="text"
+                                                    value={newTitle}
+                                                    onChange={handleTitleChange}
+                                                    onBlur={handleTitleSave}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === "Enter") handleTitleSave();
+                                                    }}
+                                                    autoFocus
+                                                    fullWidth
+                                                />
+                                        ) : (
+                                            note.title
+                                        )}
+                                    </StyledListItem>
+                                </ListWrapper>
+                            ))}
+                            <Divider />
+                        </DialogListContainer>
+                        <AddNew onClick={handleAddNote} >
                             Add New Note
-                        </span>
-                    </List>
-
-                    {/* Editor Area */}
-                    <div style={{ width: "70%", paddingLeft: "20px" }}>
+                        </AddNew>
+                    <DialogDetailsContainer >
                         {selectedNote ? (
-                            <div>
-                                <h2>{selectedNote.title}</h2>
                                 <RichEditor
+                                    title={selectedNote.title}
                                     editorState={editorState}
                                     setEditorState={(newEditorState) => {
                                         setEditorState(newEditorState);
                                         debouncedSaveNote(newEditorState);
                                     }}
                                 />
-                            </div>
                         ) : (
                             <UnSelected>Select a note to edit</UnSelected>
                         )}
-                    </div>
+                    </DialogDetailsContainer>
+                <div/>
                 </div>
+                <ContextMenu
+                    mousePos={mousePos}
+                    onClose={() => setMousePos({ mouseX: null, mouseY: null })}
+                    menuItems={[
+                        {
+                            label: "Delete",
+                            onClick: handleDeleteNote,
+                            icon: <XCircle />,
+                            disabled: !selectedNote,
+                            style: { color: "#EB5757" },
+                        },
+                    ]}
+                />
+
             </DialogContent>
-            <Menu
-                keepMounted
-                open={mousePos.mouseY !== null}
-                onClose={() => setMousePos({ mouseX: null, mouseY: null })}
-                anchorReference="anchorPosition"
-                anchorPosition={mousePos.mouseY !== null && mousePos.mouseX !== null
-                    ? { top: mousePos.mouseY, left: mousePos.mouseX }
-                    : undefined}
-            >
-                <MenuItem onClick={handleDeleteNote} style={{ color: "#EB5757" }} disabled={!selectedNote}>
-                    <XCircle /> &nbsp; Delete
-                </MenuItem>
-            </Menu>
+
             {isLoading && <CircularProgress style={{ position: 'absolute', top: '50%', left: '50%' }} />}
         </Dialog>
     );

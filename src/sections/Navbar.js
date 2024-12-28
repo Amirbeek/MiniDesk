@@ -12,7 +12,7 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import MenuIcon from '@mui/icons-material/Menu';
 import { Link } from 'react-router-dom';
-import logo from '../backround_images/Logo.png';
+import logo from '../background_images/Logo.png';
 
 const drawerWidth = 240;
 

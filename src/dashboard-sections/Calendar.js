@@ -63,7 +63,7 @@ const CloseButton = {
     color: "black",
 };
 
-const   MyCalendar = () => {
+const   MyCalendar = ({onChangeMode}) => {
     const [open, setOpen] = useState(false);
     const [EventData, setEventData] = useState([]);
 
@@ -226,19 +226,16 @@ const   MyCalendar = () => {
                 subject: args.data.Subject,
                 location: args.data.Location,
                 description: args.data.Description,
-                startTime: args.data.StartTime.toISOString(), // Ensure it's an ISO string
-                endTime: args.data.EndTime.toISOString(), // Ensure it's an ISO string
+                startTime: args.data.StartTime.toISOString(),
+                endTime: args.data.EndTime.toISOString(),
                 isAllDay: args.data.IsAllDay,
             };
 
             console.log('Updated event payload being sent:', updatedEvent);
-
-            // Sending updated event
             updateEvent(updatedEvent);
         } else if (args.requestType === "eventRemove") {
-            // Ensure args.data is not empty or undefined before trying to access the event ID
             if (Array.isArray(args.data) && args.data.length > 0) {
-                const deletedEventId = args.data[0].Id; // Access the event ID
+                const deletedEventId = args.data[0].Id;
                 if (deletedEventId) {
                     console.log('Event to delete:', deletedEventId);
                     deleteEvent(deletedEventId);
@@ -257,7 +254,7 @@ const   MyCalendar = () => {
     return (
         <div>
             <button
-                onClick={handleOpen}
+                onClick={()=>{handleOpen();onChangeMode(false)}}
                 style={{
                     cursor: "pointer",
                     backgroundColor:'transparent',

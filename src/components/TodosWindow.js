@@ -1,235 +1,267 @@
 import React, { useState, forwardRef } from "react";
-import {
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    Menu,
-    List,
-    ListItem,
-    Divider,
-    IconButton,
-    SvgIcon,
-    MenuItem,
-    TextField,
-    Checkbox,
-    Button,
-    CircularProgress,
-} from "@mui/material";
-import { X, Plus, XCircle } from "react-feather";
+import { Dialog, DialogContent, TextField, List, ListItem, Divider, Checkbox, Menu, MenuItem } from "@mui/material";
+import { X, Plus, XCircle, Trash } from "react-feather";
 import styled from "styled-components";
-
-const UnSelected = styled.div`
-    height: 60vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 16px;
-    color: #999;
-`;
-
+import AddNew from "./widget_component/AddNew";
+import DialogHeader from "./widget_component/DialogHeader";
+import UnSelected from "./widget_component/UnSelected";
+import DialogListContainer from "./widget_component/DialogListContainer";
+import DialogDetailsContainer from "./widget_component/DialogDetailsContainer";
+import DialogTitle from "./widget_component/DiaglogTitle";
+import ContextMenu from "./widget_component/ContextMenu";
 const StyledListItem = styled(ListItem)`
-    padding: 10px 10px!important;
     cursor: pointer;
     border-radius: 5px;
     margin-bottom: 5px;
-    background-color: ${(props) => (props.selected ? "#f0f0f0" : "transparent")};
     &:hover {
-        background-color: ${(props) => (props.selected ? "#e0e0e0" : "#f9f9f9")};
+        background-color: rgba(0, 0, 0, 0.05);
     }
 `;
 
-const TodosWindow = forwardRef(({ open, setOpen, initialData }, ref) => {
-    const [todoGroups, setTodoGroups] = useState(initialData || []);
-    const [selectedGroup, setSelectedGroup] = useState(null);
-    const [newGroupTitle, setNewGroupTitle] = useState("");
-    const [newTodoText, setNewTodoText] = useState("");
+const ListWrapper = styled.div`
+    padding: 5px 0;
+    border-bottom: 1px solid #e1dcdc;
+`;
+
+const AddNewListStyle = styled.div`
+    cursor: pointer;
+    height: ${({ itemCount }) =>
+            itemCount === 0
+                    ? "50vh" 
+                    : itemCount < 5
+                            ? `${55 - itemCount * 10}vh`
+                            : "50px" 
+    };
+
+    flex-shrink: 0;
+    width: 100%;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: height 0.3s ease, background-color 0.3s ease;
+`;
+
+
+const TodosWindow = forwardRef(({ open, setOpen }, ref) => {
+    const [todos, setTodos] = useState([
+        { _id: "1", title: "Sample Todo", todos: [{ _id: "1-1", text: "Sample Task 1", done: false }, { _id: "1-2", text: "Sample Task 2", done: true }] },
+    ]);
+    const [selectedTodo, setSelectedTodo] = useState(null);
+    const [newTitle, setNewTitle] = useState("");
+    const [editingTitle, setEditingTitle] = useState(false);
+    const [editingTaskId, setEditingTaskId] = useState(null);
+    const [newTaskName, setNewTaskName] = useState("");
     const [mousePos, setMousePos] = useState({ mouseX: null, mouseY: null });
-    const [isLoading, setIsLoading] = useState(false);
+    const [selectedTask, setSelectedTask] = useState(null); // Track task selected for deletion
 
     const handleClose = () => setOpen(false);
 
-    // Add a new group
-    const handleAddGroup = () => {
-        if (newGroupTitle.trim()) {
-            const newGroup = { title: newGroupTitle.trim(), todos: [] };
-            setTodoGroups([...todoGroups, newGroup]);
-            setNewGroupTitle("");
-        }
-    };
-
-    // Select a group to display its todos
-    const handleSelectGroup = (group) => {
-        setSelectedGroup(group);
-    };
-
-    // Add a todo to the selected group
     const handleAddTodo = () => {
-        if (newTodoText.trim() && selectedGroup) {
-            const updatedGroups = todoGroups.map((group) =>
-                group === selectedGroup
-                    ? { ...group, todos: [...group.todos, { text: newTodoText.trim(), completed: false }] }
-                    : group
-            );
-            setTodoGroups(updatedGroups);
-            setNewTodoText("");
+        const newTodo = { _id: Date.now().toString(), title: "New Todo", todos: [] };
+        setTodos([...todos, newTodo]);
+        setSelectedTodo(newTodo);
+    };
+
+    const handleDeleteTodo = () => {
+        if (selectedTodo) {
+            setTodos(todos.filter((todo) => todo._id !== selectedTodo._id));
+            setSelectedTodo(null);
         }
     };
 
-    // Toggle completion of a todo
-    const handleToggleComplete = (todo) => {
-        const updatedGroups = todoGroups.map((group) =>
-            group === selectedGroup
-                ? {
-                    ...group,
-                    todos: group.todos.map((t) =>
-                        t === todo ? { ...t, completed: !t.completed } : t
-                    ),
-                }
-                : group
-        );
-        setTodoGroups(updatedGroups);
+    const handleDeleteTask = () => {
+        if (selectedTodo && selectedTask) {
+            const updatedTodos = selectedTodo.todos.filter((task) => task._id !== selectedTask._id);
+            const updatedTodo = { ...selectedTodo, todos: updatedTodos };
+            setTodos(todos.map((todo) => (todo._id === selectedTodo._id ? updatedTodo : todo)));
+            setSelectedTodo(updatedTodo);
+            setSelectedTask(null);
+        }
     };
 
-    // Delete a todo
-    const handleDeleteTodo = (todo) => {
-        const updatedGroups = todoGroups.map((group) =>
-            group === selectedGroup
-                ? { ...group, todos: group.todos.filter((t) => t !== todo) }
-                : group
-        );
-        setTodoGroups(updatedGroups);
+    const handleRightClick = (event, todo, task = null) => {
+        event.preventDefault();
+        setSelectedTodo(todo);
+        setSelectedTask(task);
+        setMousePos({ mouseX: event.clientX - 2, mouseY: event.clientY - 4 });
     };
 
-    // Delete a group
-    const handleDeleteGroup = () => {
-        const updatedGroups = todoGroups.filter((group) => group !== selectedGroup);
-        setTodoGroups(updatedGroups);
-        setSelectedGroup(null);
+    const handleTitleChange = (e) => setNewTitle(e.target.value);
+
+    const handleTitleSave = () => {
+        if (newTitle.trim() && selectedTodo) {
+            const updatedTodos = todos.map((todo) =>
+                todo._id === selectedTodo._id ? { ...todo, title: newTitle } : todo
+            );
+            setTodos(updatedTodos);
+            setSelectedTodo((prev) => ({ ...prev, title: newTitle }));
+        }
+        setEditingTitle(false);
     };
 
-    const handleContextMenu = (e) => {
-        setMousePos({ mouseX: e.clientX - 2, mouseY: e.clientY - 4 });
-        e.preventDefault();
+    const handleTaskNameChange = (e) => setNewTaskName(e.target.value);
+
+    const handleTaskSave = () => {
+        if (selectedTodo && editingTaskId && newTaskName.trim()) {
+            const updatedTodo = {
+                ...selectedTodo,
+                todos: selectedTodo.todos.map((task) =>
+                    task._id === editingTaskId ? { ...task, text: newTaskName } : task
+                ),
+            };
+            setTodos(todos.map((todo) => (todo._id === selectedTodo._id ? updatedTodo : todo)));
+            setSelectedTodo(updatedTodo);
+        }
+        setEditingTaskId(null);
+    };
+
+    const handleEditTask = (task) => {
+        setEditingTaskId(task._id); // Set the task ID that is being edited
+        setNewTaskName(task.text);   // Set the task's current text to be edited
+    };
+
+    const handleToggleTask = (taskId) => {
+        if (selectedTodo) {
+            const updatedTodo = {
+                ...selectedTodo,
+                todos: selectedTodo.todos.map((task) =>
+                    task._id === taskId ? { ...task, done: !task.done } : task
+                ),
+            };
+            setTodos(todos.map((todo) => (todo._id === selectedTodo._id ? updatedTodo : todo)));
+            setSelectedTodo(updatedTodo);
+        }
+    };
+
+    const handleAddTask = () => {
+        if (selectedTodo) {
+            const updatedTodo = {
+                ...selectedTodo,
+                todos: [...selectedTodo.todos, { _id: Date.now().toString(), text: "New Task", done: false }],
+            };
+            setTodos(todos.map((todo) => (todo._id === selectedTodo._id ? updatedTodo : todo)));
+            setSelectedTodo(updatedTodo);
+        }
     };
 
     return (
         <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">
-            <DialogTitle>
-                Todo Groups
-                <IconButton
-                    aria-label="close"
-                    onClick={handleClose}
-                    size="small"
-                    sx={{
-                        position: "absolute",
-                        right: 10,
-                        top: 10,
-                        margin: "8px",
-                    }}
-                >
-                    <SvgIcon>
-                        <X />
-                    </SvgIcon>
-                </IconButton>
-            </DialogTitle>
+                <DialogHeader title="Todos Widget" onClose={handleClose} />
             <DialogContent>
-                <div style={{ display: "flex" }}>
-                    {/* Group List */}
-                    <List style={{ width: "30%", borderRight: "1px solid #ddd", paddingRight: "10px" }}>
-                        {todoGroups.map((group) => (
-                            <StyledListItem
-                                key={group.title}
-                                button
-                                selected={group === selectedGroup}
-                                onClick={() => handleSelectGroup(group)}
-                                onContextMenu={handleContextMenu}
-                            >
-                                {group.title}
-                            </StyledListItem>
+                <div style={{display: "flex"}}>
+                    <DialogListContainer>
+                        {todos.map((todo) => (
+                            <ListWrapper key={todo._id}>
+                                <StyledListItem
+                                    button
+                                    selected={todo._id === selectedTodo?._id}
+                                    onClick={() => setSelectedTodo(todo)}
+                                    onDoubleClick={() => {
+                                        setEditingTitle(true);
+                                        setNewTitle(todo.title);
+                                    }}
+                                    sx={{
+                                        backgroundColor: todo._id === selectedTodo?._id ? 'rgba(0, 0, 0, 0.08)' : 'transparent',
+                                        color: todo._id === selectedTodo?._id ? '#000' : 'inherit',
+                                    }}
+                                    onContextMenu={(e) => handleRightClick(e, todo)}
+                                >
+                                    {editingTitle && selectedTodo?._id === todo._id ? (
+                                        <TextField
+                                            variant="standard"
+                                            value={newTitle}
+                                            onChange={handleTitleChange}
+                                            onBlur={handleTitleSave}
+                                            onKeyDown={(e) => {
+                                                if (e.key === "Enter") handleTitleSave();
+                                            }}
+                                            autoFocus
+                                            fullWidth
+                                        />
+                                    ) : (
+                                            todo.title
+                                    )}
+                                </StyledListItem>
+                            </ListWrapper>
                         ))}
-                        <Divider />
-                        <div style={{ padding: "10px 0", position: "absolute", bottom: "10px" }}>
-                            <TextField
-                                placeholder="Add a new group"
-                                value={newGroupTitle}
-                                onChange={(e) => setNewGroupTitle(e.target.value)}
-                                variant="outlined"
-                                size="small"
-                                fullWidth
-                            />
-                            <IconButton onClick={handleAddGroup} style={{ marginTop: "8px" }}>
-                                <SvgIcon>
-                                    <Plus />
-                                </SvgIcon>
-                            </IconButton>
-                        </div>
-                    </List>
+                        <Divider/>
 
-                    {/* Todos in Selected Group */}
-                    <div style={{ width: "70%", paddingLeft: "20px" }}>
-                        {selectedGroup ? (
+                    </DialogListContainer>
+                    <AddNew
+                        onClick={handleAddTodo}
+                    > Add new Task
+                        </AddNew>
+                    <DialogDetailsContainer>
+                        {selectedTodo ? (
                             <div>
-                                <h2>{selectedGroup.title}</h2>
+                                <DialogTitle>{selectedTodo.title}</DialogTitle>
                                 <List>
-                                    {selectedGroup.todos.map((todo, index) => (
-                                        <ListItem key={index} style={{ display: "flex", alignItems: "center" }}>
+                                    {selectedTodo.todos.map((task) => (
+                                        <ListItem
+                                            key={task._id}
+                                            onContextMenu={(e) => handleRightClick(e, selectedTodo, task)}
+
+                                        >
                                             <Checkbox
-                                                checked={todo.completed}
-                                                onChange={() => handleToggleComplete(todo)}
-                                                style={{ marginRight: "8px" }}
+                                                checked={task.done}
+                                                onChange={() => handleToggleTask(task._id)}
                                             />
-                                            <span
-                                                style={{
-                                                    textDecoration: todo.completed ? "line-through" : "none",
-                                                    flexGrow: 1,
-                                                }}
-                                            >
-                                                {todo.text}
+                                            {editingTaskId === task._id ? (
+                                                <TextField
+                                                    variant="standard"
+                                                    value={newTaskName}
+                                                    onChange={handleTaskNameChange}
+                                                    onBlur={handleTaskSave}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === "Enter") handleTaskSave();
+                                                    }}
+                                                    autoFocus
+                                                />
+                                            ) : (
+                                                <span onDoubleClick={() => handleEditTask(task)}>
+                                                {task.text}
                                             </span>
-                                            <IconButton onClick={() => handleDeleteTodo(todo)}>
-                                                <SvgIcon>
-                                                    <X />
-                                                </SvgIcon>
-                                            </IconButton>
+                                            )}
                                         </ListItem>
                                     ))}
                                 </List>
-                                <Divider />
-                                <TextField
-                                    placeholder="Add a new task"
-                                    value={newTodoText}
-                                    onChange={(e) => setNewTodoText(e.target.value)}
-                                    variant="outlined"
-                                    size="small"
-                                    fullWidth
-                                    style={{ marginTop: "10px" }}
-                                />
-                                <Button onClick={handleAddTodo} variant="contained" color="primary" style={{ marginTop: "10px" }}>
-                                    Add Task
-                                </Button>
+                                <AddNewListStyle
+                                    onClick={handleAddTask}
+                                    itemCount={selectedTodo.todos.length}
+                                >
+                                    {selectedTodo.todos.length === 0}
+                                </AddNewListStyle>
                             </div>
                         ) : (
-                            <UnSelected>Select a group to view its tasks</UnSelected>
+                            <UnSelected>Select a todo to view details</UnSelected>
                         )}
-                    </div>
+                    </DialogDetailsContainer>
                 </div>
+                <ContextMenu
+                    mousePos={mousePos}
+                    onClose={() => setMousePos({ mouseX: null, mouseY: null })}
+                    menuItems={
+                        selectedTask
+                            ? [
+                                {
+                                    label: "Delete Task",
+                                    onClick: handleDeleteTask,
+                                    icon: <Trash />,
+                                },
+                            ]
+                            : selectedTodo
+                                ? [
+                                    {
+                                        label: "Delete Todo",
+                                        onClick: handleDeleteTodo,
+                                        icon: <XCircle />,
+                                    },
+                                ]
+                                : []
+                    }
+                />
             </DialogContent>
-            <Menu
-                keepMounted
-                open={mousePos.mouseY !== null}
-                onClose={() => setMousePos({ mouseX: null, mouseY: null })}
-                anchorReference="anchorPosition"
-                anchorPosition={
-                    mousePos.mouseY !== null && mousePos.mouseX !== null
-                        ? { top: mousePos.mouseY, left: mousePos.mouseX }
-                        : undefined
-                }
-            >
-                <MenuItem onClick={handleDeleteGroup} style={{ color: "#EB5757" }} disabled={!selectedGroup}>
-                    <XCircle /> &nbsp; Delete Group
-                </MenuItem>
-            </Menu>
-            {isLoading && <CircularProgress style={{ position: "absolute", top: "50%", left: "50%" }} />}
         </Dialog>
     );
 });

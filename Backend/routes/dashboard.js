@@ -17,5 +17,10 @@ router.put('/notes/:noteId',authenticate, dashboard.PutNote)
 
 router.delete('/notes/:noteId',authenticate, dashboard.DeleteNote);
 
+router.post('/todo', authenticate, dashboard.PostTodo)
+
+router.put('/todo/:todoId', authenticate, dashboard.PutTodo)
+
+router.delete('/todo/:todoId', authenticate, dashboard.DeleteTodo)
 
 module.exports = router;

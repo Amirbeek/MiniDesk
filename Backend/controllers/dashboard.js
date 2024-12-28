@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const Event = require('../models/Event');
 const Note = require("../models/Notes");
-
+const Todo = require('../models/Todos')
 exports.getUserInfo = async (req, res) => {
     try {
         const userId = req.user.userId;
@@ -25,7 +25,7 @@ exports.getUserInfo = async (req, res) => {
                 country: user.country,
                 events: user.events,
                 notes: user.notes,
-                todos: user.todos
+                todos: user.todos,
             },
         });
     } catch (err) {
@@ -197,13 +197,11 @@ exports.DeleteNote = async function (req, res) {
         const userId = req.user.userId;
         const noteId = req.params.noteId;
         const note = await Note.findById(noteId).populate('creator');
-
         if (note.creator._id.toString() !== userId) {
             return res.status(403).json({ message: 'Not authorized!' });
         }
-
         const user = await User.findById(userId);
-        user.notes.pull(noteId); // Assuming there's a `notes` array in the User schema
+        user.notes.pull(noteId);
         await user.save();
         await Note.findByIdAndDelete(noteId);
 
@@ -213,6 +211,92 @@ exports.DeleteNote = async function (req, res) {
         res.status(500).json({ message: 'Error deleting Note', error: e.message });
     }
 };
+exports.PostTodo = async function (req, res) {
+    try {
+        const userId = req.user.userId;
+        const { title, todos } = req.body;
 
+        if (!title) {
+            return res.status(400).json({ message: 'Title is required' });
+        }
+        const defaultTodos = todos === undefined ? [{ text: "Sample Task", done: false, _id: Date.now().toString() }] : todos;
 
+        const todo = new Todo({
+            title,
+            todos: defaultTodos,
+            creator: userId,
+        });
 
+        await todo.save();
+
+        // Add the created Todo to the user's todo list
+        const user = await User.findById(userId);
+        user.todos.push(todo);
+        await user.save();
+
+        // Return the created Todo with tasks
+        res.status(201).json({
+            message: "Todo created successfully",
+            todo: {
+                _id: todo._id,
+                title: todo.title,
+                todos: todo.todos
+            }
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Error creating todo", error: err });
+    }
+};
+exports.PutTodo = async function (req, res) {
+    try {
+        const userId = req.user.userId;
+        const todoId = req.params.todoId;
+        const { title, todos } = req.body;
+
+        const todo = await Todo.findById(todoId);
+
+        if (!todo) {
+            return res.status(404).json({ message: 'Todo not found' });
+        }
+
+        if (todo.creator.toString() !== userId) {
+            return res.status(403).json({ message: 'Not authorized to edit this todo' });
+        }
+
+        if (title) todo.title = title;
+        if (todos) todo.todos = todos;
+
+        await todo.save();
+
+        res.status(200).json({ message: 'Todo updated successfully', todo });
+    } catch (err) {
+        console.error('Error updating todo:', err);
+        res.status(500).json({ message: 'Error updating todo', error: err.message });
+    }
+};
+exports.DeleteTodo = async function (req, res) {
+    try {
+        const userId = req.user.userId;
+        const todoId = req.params.todoId;
+
+        const todo = await Todo.findById(todoId).populate('creator');
+
+        if (!todo) {
+            return res.status(404).json({ message: 'Todo not found' });
+        }
+
+        if (todo.creator._id.toString() !== userId) {
+            return res.status(403).json({ message: 'Not authorized!' });
+        }
+
+        const user = await User.findById(userId);
+        user.todos.pull(todoId);
+        await user.save();
+        await Todo.findByIdAndDelete(todoId);
+        res.status(200).json({ message: 'Todo deleted successfully', todoId });
+    } catch (err) {
+        console.error('Error deleting todo:', err);
+        res.status(500).json({ message: 'Error deleting todo', error: err.message });
+    }
+};

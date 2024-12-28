@@ -3,7 +3,7 @@ import ComponentButton from "../components/ComponentButton";
 import NotesWindow from "../components/NotesWindow";
 
 
-function Note({notesData}) {
+function Note({notesData,onChangeMode}) {
     const [open, setOpen] = useState(false);
     const handleClickOpen = () => {
         setOpen(true);
@@ -35,7 +35,10 @@ function Note({notesData}) {
                     marginTop: 15,
                     width: '100%',
                 }}
-                onClick={handleClickOpen}
+                onClick={()=> {
+                    handleClickOpen();
+                    onChangeMode(false)
+                }}
             >
                 <ComponentButton header={'Note'} HeaderColor={'#e77f23'} children={Component_data} />
             </button>

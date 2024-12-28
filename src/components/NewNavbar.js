@@ -11,7 +11,6 @@ import { alpha, styled } from '@mui/material/styles';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import Settings from "./Settings";
 
-
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
     borderRadius: theme.shape.borderRadius,
@@ -26,7 +25,6 @@ const Search = styled('div')(({ theme }) => ({
         marginLeft: theme.spacing(3),
         width: 'auto',
     },
-
 }));
 
 const SearchIconWrapper = styled('div')(({ theme }) => ({
@@ -46,14 +44,18 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
         paddingLeft: `calc(1em + ${theme.spacing(4)})`,
         transition: theme.transitions.create('width'),
         width: '100%',
-
         [theme.breakpoints.up('md')]: {
             width: '60ch',
         },
     },
 }));
 
-export default function MenuAppBar({UserInfo, setEditMode}) {
+export default function MenuAppBar({ UserInfo, setEditMode, editMode }) {
+    const handelOffEditMode = ()=>{
+        if (editMode === true) {
+            setEditMode(false)
+        }
+    }
     const [anchorEl, setAnchorEl] = React.useState(null);
 
     const handleMenu = (event) => {
@@ -63,21 +65,22 @@ export default function MenuAppBar({UserInfo, setEditMode}) {
     const handleClose = () => {
         setAnchorEl(null);
     };
-    const handleEditDashboard = ()=>{
+
+    const handleEditDashboard = () => {
         setEditMode(true);
         setAnchorEl(null);
-    }
-
+    };
     return (
         <Box sx={{ flexGrow: 1 }}>
-                <AppBar position="static" sx={{ backgroundColor: 'transparent', boxShadow: 'none' ,padding: '10px'}}>
-                <Toolbar sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <AppBar position="static"  sx={{ backgroundColor: 'transparent', boxShadow: 'none', padding: '10px' }}>
+                <Toolbar  onClick={handelOffEditMode} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                    {/* Logo Section */}
                     <Box sx={{ position: 'absolute', left: 20 }}>
-                        <h1>App</h1>
+                       Appp
                     </Box>
 
+                    {/* Search Section */}
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-
                         <Search>
                             <SearchIconWrapper>
                                 <SearchIcon />
@@ -116,8 +119,16 @@ export default function MenuAppBar({UserInfo, setEditMode}) {
                         >
                             <Settings UserInfo={UserInfo} />
                             <MenuItem onClick={handleClose}>Profile</MenuItem>
-                            <MenuItem onClick={handleEditDashboard}>Edit HomePage</MenuItem>
+                            <MenuItem
+                                onClick={() => {
+                                    setEditMode(true);
+                                    handleClose(); // Close the menu after activating edit mode
+                                }}
+                            >
+                                Edit HomePage
+                            </MenuItem>
                         </Menu>
+
                     </Box>
                 </Toolbar>
             </AppBar>

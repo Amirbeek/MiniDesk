@@ -1,9 +1,10 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { Grid } from "@mui/material";
-import Bimage from '../backround_images/Bimage.png';
-import {useNavigate} from "react-router-dom";
+import { Grid } from '@mui/material';
+import Bimage from '../background_images/Bimage.png';
+import { useNavigate } from 'react-router-dom';
 
+// Define the styled components outside the main component for better performance and structure
 const GoogleButtonStyle = styled.button`
     padding: 10px;
     font-weight: bolder;
@@ -12,27 +13,32 @@ const GoogleButtonStyle = styled.button`
     gap: 6px;
     border: 2px solid #5e17eb;
     border-radius: 0px;
-    transition-duration: .3s;
+    transition: background-color 0.3s, color 0.3s;
     background-color: transparent;
-    &:hover {
+
+    &:hover, &:focus {
         background-color: #5e17eb;
         color: #fff;
     }
 `;
 
 const AboutContainer = styled.div`
-    padding: 100px 100px;
+    padding: 100px;
     text-align: left;
+
     h1 {
         color: #000;
         line-height: 72px;
-        margin-top: 18px;margin-bottom: 10px;
+        margin-top: 18px;
+        margin-bottom: 10px;
         font-size: 60px;
         font-weight: 700;
+
         span {
             color: #5e17eb;
         }
     }
+
     @media (max-width: 768px) {
         padding: 40px 20px;
 
@@ -43,39 +49,49 @@ const AboutContainer = styled.div`
     }
 `;
 
-const navigate = async (url) => {
+const navigateToUrl = (url) => {
     window.location.href = url;
 };
 
-
-async function auth() {
+const auth = async () => {
     try {
         const response = await fetch('http://localhost:5000/request', { method: 'GET' });
         const data = await response.json();
 
         if (data.url) {
-            navigate(data.url);
+            navigateToUrl(data.url);
         } else {
             console.error('Failed to retrieve Google OAuth URL');
         }
     } catch (error) {
         console.error('Error during authentication:', error);
     }
-}
+};
 
 const About = () => {
-    const [currentText, setCurrentText] = useState("design");
+    const [currentText, setCurrentText] = useState('design');
     const navigate = useNavigate();
 
     useEffect(() => {
+        const texts = ['organize', 'manage', 'prioritize'];
+
         const urlParams = new URLSearchParams(window.location.search);
         const token = urlParams.get('token');
 
-        if (token){
+        let index = 0;
+        const interval = setInterval(() => {
+            setCurrentText(texts[index]);
+            index = (index + 1) % texts.length;
+        }, 1300);
+
+        if (token) {
             localStorage.setItem('authToken', token);
             navigate('/dashboard');
         }
+
+        return () => clearInterval(interval);
     }, [navigate]);
+
     return (
         <Grid container spacing={2}>
             <Grid item xs={12} md={6}>
@@ -83,10 +99,10 @@ const About = () => {
                     <h1>
                         Welcome to MiniDesk
                         <br />
-                        <span style={{ color: '#5e17eb' }}>{currentText}</span> your productivity companion
+                        <span>{currentText}</span> your productivity companion
                     </h1>
-                    <GoogleButtonStyle type='button' onClick={() => auth()}>
-                        Sign with Google
+                    <GoogleButtonStyle type="button" onClick={auth}>
+                        Sign in with Google
                     </GoogleButtonStyle>
                 </AboutContainer>
             </Grid>
