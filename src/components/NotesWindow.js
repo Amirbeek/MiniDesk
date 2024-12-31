@@ -3,36 +3,22 @@ import debounce from "lodash.debounce";
 import {
     Dialog,
     DialogContent,
-    ListItem,
     Divider,
     TextField,
     CircularProgress,
 } from "@mui/material";
 import { XCircle } from "react-feather";
 import { EditorState, ContentState, convertToRaw, convertFromRaw } from "draft-js";
-import RichEditor from "./NoteEditor"; // Assuming you have a RichEditor component
-import styled from "styled-components";
+import RichEditor from "./NoteEditor";
 import AddNew from "./widget_component/AddNew";
 import DialogHeader from "./widget_component/DialogHeader";
 import UnSelected from "./widget_component/UnSelected";
 import DialogListContainer from "./widget_component/DialogListContainer";
 import DialogDetailsContainer from "./widget_component/DialogDetailsContainer";
 import ContextMenu from "./widget_component/ContextMenu";
-
-const StyledListItem = styled(ListItem)`
-    cursor: pointer;
-    border-radius: 5px;
-    margin-bottom: 5px;
-    &:hover {
-        background-color: rgba(0, 0, 0, 0.05);
-    }
-`;
-const ListWrapper = styled.div`
-    padding: 5px 5px 5px 0;
-    border-bottom: 1px solid #e1dcdc;
-`;
-
-
+import StyledListItem from "./widget_component/StyledListItem";
+import ListWrapper  from "./widget_component/ListWrapper";
+const API_URL = `${process.env.BACKEND_URL}/api/notes`;
 
 
 const NotesWindow = forwardRef(({ open, setOpen, NoteData }, ref) => {

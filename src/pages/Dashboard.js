@@ -9,6 +9,7 @@ import Note from "../dashboard-sections/Note";
 import BookMark from "../components/BookMark";
 import ScrollBox from "../components/ScrollBox";
 import Data from '../data'
+
 const BackImage = styled.div`
     background: url("https://w0.peakpx.com/wallpaper/236/488/HD-wallpaper-mac-os-ventura-dark-macos-ventura-macbook-apple-computer.jpg") no-repeat center center;
     background-size: cover;

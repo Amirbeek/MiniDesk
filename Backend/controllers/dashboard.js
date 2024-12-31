@@ -2,6 +2,7 @@ const User = require('../models/User');
 const Event = require('../models/Event');
 const Note = require("../models/Notes");
 const Todo = require('../models/Todos')
+
 exports.getUserInfo = async (req, res) => {
     try {
         const userId = req.user.userId;
@@ -228,13 +229,9 @@ exports.PostTodo = async function (req, res) {
         });
 
         await todo.save();
-
-        // Add the created Todo to the user's todo list
         const user = await User.findById(userId);
         user.todos.push(todo);
         await user.save();
-
-        // Return the created Todo with tasks
         res.status(201).json({
             message: "Todo created successfully",
             todo: {
@@ -249,27 +246,39 @@ exports.PostTodo = async function (req, res) {
     }
 };
 exports.PutTodo = async function (req, res) {
+    const userId = req.user.userId;
+    const todoId = req.params.todoId;
+    const { title, todos } = req.body;
     try {
-        const userId = req.user.userId;
-        const todoId = req.params.todoId;
-        const { title, todos } = req.body;
-
         const todo = await Todo.findById(todoId);
-
         if (!todo) {
             return res.status(404).json({ message: 'Todo not found' });
         }
-
         if (todo.creator.toString() !== userId) {
             return res.status(403).json({ message: 'Not authorized to edit this todo' });
         }
 
-        if (title) todo.title = title;
-        if (todos) todo.todos = todos;
+        if (title) {
+            todo.title = title;
+        }
+        if (todos) {
+            const updatedTasks = todos.map(submittedTask => {
+                if (submittedTask._id) {
+                    const existingTask = todo.todos.id(submittedTask._id);
+                    if (existingTask) {
+                        existingTask.text = submittedTask.text ?? existingTask.text;
+                        existingTask.done = submittedTask.done ?? existingTask.done;
+                        return existingTask;
+                    }
+                } else {
+                    return { text: submittedTask.text, done: submittedTask.done };
+                }
+            });
 
-        await todo.save();
-
-        res.status(200).json({ message: 'Todo updated successfully', todo });
+            todo.todos = updatedTasks.filter(task => task != null);
+        }
+        const updatedTodo = await todo.save();
+        res.status(200).json({ message: 'Todo updated successfully', todo: updatedTodo });
     } catch (err) {
         console.error('Error updating todo:', err);
         res.status(500).json({ message: 'Error updating todo', error: err.message });
@@ -279,7 +288,6 @@ exports.DeleteTodo = async function (req, res) {
     try {
         const userId = req.user.userId;
         const todoId = req.params.todoId;
-
         const todo = await Todo.findById(todoId).populate('creator');
 
         if (!todo) {

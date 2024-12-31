@@ -74,7 +74,7 @@ function Todo({ todosData,onChangeMode }) {
             <TodosWindow
                 open={open}
                 setOpen={setOpen}
-                TodoData={todosData}
+                todosData={todosData}
             />
         </div>
     );
