@@ -1,8 +1,9 @@
-import React from "react";
+import React, {useContext} from "react";
 import styled, { keyframes, css } from "styled-components";
 import { Minus } from "react-feather";
+import DeleteItem from "./DeleteItem";
+import {EditHomePageContext} from "../EditHomePage";
 
-// Define the vibration animation using keyframes
 const vibration = keyframes`
     0% { transform: rotate(0deg); }
     25% { transform: rotate(2deg); }
@@ -12,32 +13,16 @@ const vibration = keyframes`
 `;
 
 const SingleBookMark = styled.div`
-    cursor: ${(props) => (props.editMode ? 'default' : 'pointer')}; /* Change cursor when in edit mode */
+    cursor: ${(props) => (props.editMode ? 'default' : 'pointer')}; 
     text-align: center;
     transition: all 0.3s ease;
     color: #eeeeee;
     position: relative;
-
-    /* Apply vibration animation when in editMode */
     ${(props) =>
             props.editMode &&
             css`
             animation: ${vibration} 0.5s infinite;
         `}
-
-    span {
-        cursor: pointer;
-        position: absolute;
-        right: 70px;
-        top: -20px;
-        display: ${(props) => (props.editMode ? 'block' : 'none')}; /* Only show minus icon in editMode */
-        background-color: #f44336;
-        border-radius: 50%;
-        border: 3px solid #fff;
-        padding: 3px 1px 1px 1px;
-        box-sizing: border-box;
-    }
-
     & img {
         background-color: hsla(0, 0%, 100%, 0.4);
         border-radius: .8rem;
@@ -49,7 +34,7 @@ const SingleBookMark = styled.div`
     }
 
     &:hover img {
-        transform: ${(props) => (props.editMode ? 'none' : 'scale(1.2)')}; /* Disable hover scale if editMode is true */
+        transform: ${(props) => (props.editMode ? 'none' : 'scale(1.2)')};
     }
 
     & small {
@@ -58,7 +43,9 @@ const SingleBookMark = styled.div`
     }
 `;
 
-const BookmarkItem = ({ bookmark, onClick, editMode , onDelete }) => {
+const BookmarkItem = ({ bookmark, onClick , onDelete }) => {
+    const { editMode, setEditMode } = useContext(EditHomePageContext);
+
     const handleClick = () => {
         if (editMode ===false) {
             onClick(bookmark.link);
@@ -70,14 +57,14 @@ const BookmarkItem = ({ bookmark, onClick, editMode , onDelete }) => {
             onClick={handleClick}
             editMode={editMode}
         >
-            <span onClick={onDelete}>
+            <DeleteItem editMode={editMode} onDelete={()=>onDelete(bookmark._id)}>
                 <Minus />
-            </span>
+            </DeleteItem>
             <img
                 src={`${new URL(bookmark.link).origin}/favicon.ico`}
                 alt={`${bookmark.title} logo`}
                 onError={(e) => {
-                    e.target.src = 'https://via.placeholder.com/16';
+                    e.target.src = 'https://www.google.com/favicon.ico';
                 }}
             />
             <small>{bookmark.title}</small>

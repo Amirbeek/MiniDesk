@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { TextField, Button, Typography, Box } from '@mui/material';
-import axios from 'axios';
 import Navbar from "../sections/Navbar";
+import useApi from "../useApi";
 
 const ResetPassword = () => {
     const { token } = useParams();
@@ -10,24 +10,27 @@ const ResetPassword = () => {
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(false);
     const navigate = useNavigate();
+    const apiCall = useApi();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setMessage('');
-
         try {
-            const response = await axios.post(`http://localhost:5000/api/auth/reset-password/${token}`, { password });
-            setMessage(response.data.message);
+            const data = await apiCall({
+                endpoint: `auth/reset-password/${token}`,
+                method: 'POST',
+                body: { password },
+            });
 
+            setMessage(data.message);
             navigate('/login');
         } catch (error) {
-            setMessage(error.response?.data?.message || 'Reset failed');
+            setMessage(error.message || 'Reset failed');
+        } finally {
+            setLoading(false);
         }
-
-        setLoading(false);
     };
-
     return (
         <>
             <Navbar/>

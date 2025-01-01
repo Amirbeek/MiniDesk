@@ -18,10 +18,9 @@ import {
     DragAndDrop,
     Resize,
 } from "@syncfusion/ej2-react-schedule";
-registerLicense('Ngo9BigBOggjHTQxAR8/V1NMaF5cXmBCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWH1ccnRQQ2NdVkxzWUA=')
 
+registerLicense('Ngo9BigBOggjHTQxAR8/V1NMaF5cXmBCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWH1dcXVVRWhZU0NzXkE=')
 
-// Styled components for the modal
 const ModalBackground = {
     position: "fixed",
     top: 0,

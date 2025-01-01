@@ -3,13 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { TextField, Button, Grid, Typography, Box, Container, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Navbar from "../sections/Navbar";
+import useApi from "../useApi";
 
 const SignupForm = () => {
     const navigate = useNavigate();
+    const apiCall = useApi();
 
     const countries = ['USA', 'Canada', 'UK', 'Australia', 'Germany', 'France'];
 
@@ -26,11 +27,16 @@ const SignupForm = () => {
 
     const handleSubmit = async (values, { setSubmitting }) => {
         try {
-            const response = await axios.post('http://localhost:5000/api/auth/signup', values);
-            toast.success(response.data.message);
+            const data = await apiCall({
+                endpoint: 'auth/signup',
+                method: 'POST',
+                body: values,
+            });
+
+            toast.success(data.message);
             navigate('/login');
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Signup failed');
+            toast.error(error.message || 'Signup failed');
         } finally {
             setSubmitting(false);
         }

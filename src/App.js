@@ -9,13 +9,18 @@ import ResendActivationEmail from "./pages/ResendActivationEmail";
 import Dashboard from "./pages/Dashboard";
 import Note from "./components/Note";
 import Main from "./Main";
+import EditHomePageProvider from './components/EditHomePage'; // Ensure correct path
 
 function App() {
     return (
         <Router>
             <Routes>
                 <Route path="/" element={<Main />} />
-                <Route path="/dashboard" element={ <Dashboard /> } />
+                <Route path="/dashboard" element={
+                    <EditHomePageProvider>
+                        <Dashboard />
+                    </EditHomePageProvider>
+                } />
                 <Route path='test' element={<Note />} />
                 <Route path="/register" element={<SignupForm />} />
                 <Route path="/login" element={<LoginForm />} />

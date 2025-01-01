@@ -10,6 +10,8 @@ import SearchIcon from '@mui/icons-material/Search';
 import { alpha, styled } from '@mui/material/styles';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import Settings from "./Settings";
+import {useContext} from "react";
+import {EditHomePageContext} from "./EditHomePage";
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -50,12 +52,20 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     },
 }));
 
-export default function MenuAppBar({ UserInfo, setEditMode, editMode }) {
+export default function MenuAppBar({ UserInfo }) {
+    const { editMode, setEditMode} = useContext(EditHomePageContext);
+
     const handelOffEditMode = ()=>{
-        if (editMode === true) {
+            setEditMode(true)
+            console.log(editMode)
+    }
+    const handelOffEditModee = ()=>{
+        if (editMode === true){
             setEditMode(false)
+            console.log(editMode)
         }
     }
+
     const [anchorEl, setAnchorEl] = React.useState(null);
 
     const handleMenu = (event) => {
@@ -66,20 +76,15 @@ export default function MenuAppBar({ UserInfo, setEditMode, editMode }) {
         setAnchorEl(null);
     };
 
-    const handleEditDashboard = () => {
-        setEditMode(true);
-        setAnchorEl(null);
-    };
+
     return (
         <Box sx={{ flexGrow: 1 }}>
             <AppBar position="static"  sx={{ backgroundColor: 'transparent', boxShadow: 'none', padding: '10px' }}>
-                <Toolbar  onClick={handelOffEditMode} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                    {/* Logo Section */}
+                <Toolbar onClick={handelOffEditModee} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                     <Box sx={{ position: 'absolute', left: 20 }}>
                        Appp
                     </Box>
 
-                    {/* Search Section */}
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <Search>
                             <SearchIconWrapper>
@@ -121,8 +126,8 @@ export default function MenuAppBar({ UserInfo, setEditMode, editMode }) {
                             <MenuItem onClick={handleClose}>Profile</MenuItem>
                             <MenuItem
                                 onClick={() => {
-                                    setEditMode(true);
-                                    handleClose(); // Close the menu after activating edit mode
+                                    handelOffEditMode();
+                                    handleClose();
                                 }}
                             >
                                 Edit HomePage

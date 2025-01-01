@@ -39,6 +39,7 @@
     "react-feather": "^2.0.10",
     "react-icons": "^5.4.0",
     "react-id-generator": "^3.0.2",
+    "react-modal": "^3.16.3",
     "react-perfect-scrollbar": "^1.5.8",
     "react-router-dom": "^7.0.1",
     "react-scripts": "5.0.1",
@@ -47,6 +48,7 @@
     "socket.io-client": "^4.8.1",
     "style-component": "^0.0.1",
     "styled-components": "^6.1.13",
+    "swiper": "^11.1.15",
     "tui-calendar": "^1.15.3",
     "yup": "^1.4.0"
   },

@@ -1,5 +1,5 @@
 import React, { useState, forwardRef } from "react";
-import { Dialog, DialogContent, TextField, List, ListItem, Divider, Checkbox, Menu, MenuItem } from "@mui/material";
+import { Dialog, DialogContent, TextField, List, ListItem, Divider, Checkbox } from "@mui/material";
 import { XCircle, Trash } from "react-feather";
 import AddNew from "./widget_component/AddNew";
 import DialogHeader from "./widget_component/DialogHeader";
@@ -12,7 +12,6 @@ import ContextMenu from "./widget_component/ContextMenu";
 import StyledListItem from "./widget_component/StyledListItem";
 import ListWrapper  from "./widget_component/ListWrapper";
 import AddNewListStyle from "./widget_component/AddNewListStyle";
-
 const TodosWindow = forwardRef(({ open, setOpen ,todosData}, ref) => {
     const [todos, setTodos] = useState(todosData);
     const [selectedTodo, setSelectedTodo] = useState(null);

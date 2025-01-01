@@ -4,7 +4,6 @@ import { Button, Grid } from '@mui/material';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate hook
 import backgroundImage from '../background_images/background.png';
 
-// Define a theme with your color variables
 const theme = {
     whiteColor: 'hsl(0, 0%, 100%)',
     blackColor: 'hsl(0, 0%, 0%)',

@@ -1,29 +1,34 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
 import { Button, Typography, CircularProgress, Box } from '@mui/material';
 import Navbar from "../sections/Navbar";
+import useApi from "../useApi";
 
 const ActivateAccount = () => {
     const { token } = useParams();
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
     const navigate = useNavigate();
+    const apiCall = useApi();
 
     const handleActivate = async () => {
         setLoading(true);
         setMessage('');
+
         try {
-            const response = await axios.post(`http://localhost:5000/api/auth/activate/${token}`);
-            setMessage(response.data.message);
+            const data = await apiCall({
+                endpoint: `auth/activate/${token}`,
+                method: 'POST',
+            });
+
+            setMessage(data.message);
             navigate('/login');
         } catch (error) {
-            setMessage(error.response?.data?.message || 'Activation failed');
+            setMessage(error.message || 'Activation failed');
         } finally {
             setLoading(false);
         }
     };
-
     return (
         <>
             <Navbar/>

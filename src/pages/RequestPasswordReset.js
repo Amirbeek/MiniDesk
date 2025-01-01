@@ -1,13 +1,14 @@
 import React from 'react';
 import { TextField, Button, Grid, Typography, Box } from '@mui/material';
-import axios from 'axios';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { useNavigate } from "react-router-dom";
 import Navbar from "../sections/Navbar";
+import useApi from "../useApi";
 
 const RequestPasswordReset = () => {
     const navigate = useNavigate();
+    const apiCall = useApi();
 
     const validationSchema = Yup.object().shape({
         email: Yup.string().email('Invalid email format').required('Email is required'),
@@ -15,18 +16,24 @@ const RequestPasswordReset = () => {
 
     const handleSubmit = async (values, { setSubmitting }) => {
         try {
-            const response = await axios.post('http://localhost:5000/api/auth/reset-password', values);
-            alert(response.data.message);
+            const data = await apiCall({
+                endpoint: 'auth/reset-password',
+                method: 'POST',
+                body: values,
+            });
+
+            alert(data.message);
         } catch (error) {
-            alert(error.response?.data?.message || 'Password reset failed');
+            alert(error.message || 'Password reset failed');
         } finally {
             setSubmitting(false);
         }
     };
 
+
     return (
         <>
-        <Navbar/>
+            <Navbar/>
             <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh',  }}>
                 <Box sx={{ padding: 3, border: '1px solid #ccc', borderRadius: 2, backgroundColor: '#fff', maxWidth: 400, width: '100%' }}>
                     <Typography variant="h4" align="center" gutterBottom>

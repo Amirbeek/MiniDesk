@@ -1,27 +1,32 @@
 import React, { useState } from 'react';
 import { TextField, Button, Typography, Box } from '@mui/material';
-import axios from 'axios';
 import Navbar from "../sections/Navbar";
+import useApi from "../useApi";
 
 const ResendActivationEmail = () => {
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(false);
+    const apiCall = useApi();
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setMessage('');
-
         try {
-            const response = await axios.post('http://localhost:5000/api/auth/recent-activation', { email });
-            setMessage(response.data.message);
+            const data = await apiCall({
+                endpoint: 'auth/recent-activation',
+                method: 'POST',
+                body: { email },
+            });
+            setMessage(data.message);
         } catch (error) {
-            setMessage(error.response?.data?.message || 'Something went wrong. Please try again later.');
+            setMessage(error.message || 'Something went wrong. Please try again later.');
+        } finally {
+            setLoading(false);
         }
-
-        setLoading(false);
     };
+
 
     return (
         <>

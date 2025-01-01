@@ -3,13 +3,15 @@ import { useNavigate } from 'react-router-dom';
 import {TextField, Button, Grid, Typography, Box, Container} from '@mui/material';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import axios from 'axios';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Navbar from "../sections/Navbar";
+import useApi from "../useApi";
+
 
 const LoginForm = () => {
     const navigate = useNavigate();
+    const apiCall = useApi();
 
     const validationSchema = Yup.object().shape({
         username_or_email: Yup.string().required('Username or Email is required'),
@@ -18,17 +20,23 @@ const LoginForm = () => {
 
     const handleSubmit = async (values, { setSubmitting }) => {
         try {
-            const response = await axios.post('http://localhost:5000/api/auth/login', values);
-            toast.success(response.data.message);
+            const data = await apiCall({
+                endpoint: 'auth/login',
+                method: 'POST',
+                body: values,
+            });
+
+            toast.success(data.message);
+            localStorage.setItem('authToken', data.token);
             navigate('/dashboard');
-            localStorage.setItem('authToken', response.data.token);
             window.location.reload();
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Login failed');
+            toast.error(error.message || 'Login failed');
         } finally {
             setSubmitting(false);
         }
     };
+
 
     return (
         <Container >

@@ -16,10 +16,9 @@ import UnSelected from "./widget_component/UnSelected";
 import DialogListContainer from "./widget_component/DialogListContainer";
 import DialogDetailsContainer from "./widget_component/DialogDetailsContainer";
 import ContextMenu from "./widget_component/ContextMenu";
+import useApi from "../useApi";
 import StyledListItem from "./widget_component/StyledListItem";
 import ListWrapper  from "./widget_component/ListWrapper";
-const API_URL = `${process.env.BACKEND_URL}/api/notes`;
-
 
 const NotesWindow = forwardRef(({ open, setOpen, NoteData }, ref) => {
     const [notes, setNotes] = useState(NoteData);
@@ -29,66 +28,51 @@ const NotesWindow = forwardRef(({ open, setOpen, NoteData }, ref) => {
     const [editingTitle, setEditingTitle] = useState(false);
     const [newTitle, setNewTitle] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+    const apiCall = useApi();
 
     const debouncedSaveNote = debounce(async (newEditorState) => {
         if (!selectedNote) return;
+
         const rawContent = convertToRaw(newEditorState.getCurrentContent());
         const updatedNote = {
             ...selectedNote,
             content: rawContent,
-            title: selectedNote.title
+            title: selectedNote.title,
         };
 
-        const token = localStorage.getItem('authToken');
         try {
-            const response = await fetch(`http://localhost:5000/api/notes/${selectedNote._id}`, {
+            const data = await apiCall({
+                endpoint: `notes/${selectedNote._id}`,
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify(updatedNote),
+                body: updatedNote,
             });
 
-            const data = await response.json();
-            if (response.ok) {
-                const updatedNotes = notes.map((note) =>
-                    note._id === selectedNote._id ? updatedNote : note
-                );
-                setNotes(updatedNotes);
-            } else {
-                console.error('Error:', data.message || 'Error saving note');
-            }
+            const updatedNotes = notes.map((note) =>
+                note._id === selectedNote._id ? data.note : note
+            );
+            setNotes(updatedNotes);
         } catch (error) {
             console.error('Error saving note:', error);
         }
     }, 500);
 
     const handleClose = () => setOpen(false);
-
     const handleAddNote = async () => {
         setIsLoading(true);
         const newNote = { title: "New Note", content: editorState.getCurrentContent() };
 
-        const token = localStorage.getItem('authToken');
         try {
-            const response = await fetch('http://localhost:5000/api/notes', {
+            const data = await apiCall({
+                endpoint: 'notes',
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify(newNote),
+                body: newNote,
             });
 
-            const data = await response.json();
-            if (response.ok) {
-                setNotes([...notes, data.note]);
-                setSelectedNote(data.note);
-                setEditorState(EditorState.createWithContent(data.note.content || ContentState.createFromText('')));
-            } else {
-                console.error('Error:', data.message || 'Error adding note');
-            }
+            setNotes([...notes, data.note]);
+            setSelectedNote(data.note);
+            setEditorState(
+                EditorState.createWithContent(data.note.content || ContentState.createFromText(''))
+            );
         } catch (error) {
             console.error('Error adding note:', error);
         } finally {
@@ -131,38 +115,34 @@ const NotesWindow = forwardRef(({ open, setOpen, NoteData }, ref) => {
         }
 
         setIsLoading(true);
-        const token = localStorage.getItem('authToken');
+
         try {
-            const response = await fetch(`http://localhost:5000/api/notes/${selectedNote._id}`, {
+            await apiCall({
+                endpoint: `notes/${selectedNote._id}`,
                 method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                },
             });
 
-            const data = await response.json();
-            if (response.ok) {
-                const updatedNotes = notes.filter((note) => note._id !== selectedNote._id);
-                setNotes(updatedNotes);
+            const updatedNotes = notes.filter((note) => note._id !== selectedNote._id);
+            setNotes(updatedNotes);
 
-                if (updatedNotes.length > 0) {
-                    setSelectedNote(updatedNotes[0]);
-                    setEditorState(EditorState.createWithContent(updatedNotes[0].content || ContentState.createFromText('')));
-                } else {
-                    setSelectedNote(null);
-                    setEditorState(EditorState.createEmpty());
-                }
-
-                setMousePos({ mouseX: null, mouseY: null });
+            if (updatedNotes.length > 0) {
+                setSelectedNote(updatedNotes[0]);
+                setEditorState(
+                    EditorState.createWithContent(updatedNotes[0].content || ContentState.createFromText(''))
+                );
             } else {
-                console.error('Error:', data.message || 'Error deleting note');
+                setSelectedNote(null);
+                setEditorState(EditorState.createEmpty());
             }
+
+            setMousePos({ mouseX: null, mouseY: null });
         } catch (error) {
             console.error('Error deleting note:', error);
         } finally {
             setIsLoading(false);
         }
     };
+
     const handleTitleDoubleClick = (note) => {
         if (selectedNote._id === note._id) {
             setEditingTitle(true);
@@ -175,28 +155,18 @@ const NotesWindow = forwardRef(({ open, setOpen, NoteData }, ref) => {
     const handleTitleSave = async () => {
         if (newTitle.trim()) {
             const updatedNote = { ...selectedNote, title: newTitle };
-
-            const token = localStorage.getItem('authToken');
             try {
-                const response = await fetch(`http://localhost:5000/api/notes/${selectedNote._id}`, {
+                await apiCall({
+                    endpoint: `notes/${selectedNote._id}`,
                     method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`,
-                    },
-                    body: JSON.stringify(updatedNote),
+                    body: updatedNote,
                 });
 
-                const data = await response.json();
-                if (response.ok) {
-                    const updatedNotes = notes.map((note) =>
-                        note._id === selectedNote._id ? { ...note, title: newTitle } : note
-                    );
-                    setNotes(updatedNotes);
-                    setEditingTitle(false);
-                } else {
-                    console.error('Error:', data.message || 'Error saving title');
-                }
+                const updatedNotes = notes.map((note) =>
+                    note._id === selectedNote._id ? { ...note, title: newTitle } : note
+                );
+                setNotes(updatedNotes);
+                setEditingTitle(false);
             } catch (error) {
                 console.error('Error saving title:', error);
             }
@@ -204,6 +174,7 @@ const NotesWindow = forwardRef(({ open, setOpen, NoteData }, ref) => {
             setEditingTitle(false);
         }
     };
+
 
     return (
         <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">
@@ -218,7 +189,10 @@ const NotesWindow = forwardRef(({ open, setOpen, NoteData }, ref) => {
                                         button
                                         selected={note._id === selectedNote?._id}
                                         onClick={() => handleSelectNote(note)}
-                                        onContextMenu={(e) => handleContextMenu(e, note._id)}
+                                        onContextMenu={(e) => {
+                                            handleContextMenu(e, note._id);
+                                            handleSelectNote(note);
+                                        }}
                                         onDoubleClick={() => handleTitleDoubleClick(note)}
                                         sx={{
                                             backgroundColor: note._id === selectedNote?._id ? 'rgba(0, 0, 0, 0.08)' : 'transparent',

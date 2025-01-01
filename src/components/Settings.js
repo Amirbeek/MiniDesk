@@ -4,8 +4,8 @@ import "tui-calendar/dist/tui-calendar.css";
 import "../style/MyCalendar.css";
 import styled from "styled-components";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import MenuItem from '@mui/material/MenuItem';
+import useApi from "../useApi";
 
 const Header = styled.header`
     display: flex;
@@ -19,6 +19,7 @@ const Header = styled.header`
 const Settings = ({ UserInfo }) => {
     const [open, setOpen] = useState(false);
     const navigate = useNavigate();
+    const apiCall = useApi();
 
     const handleOpen = () => {
         setOpen(true);
@@ -36,9 +37,10 @@ const Settings = ({ UserInfo }) => {
     const deleteUser = async () => {
         const token = localStorage.getItem('authToken');
         try {
-            const response = await axios.delete('http://localhost:5000/api/auth/delete', {
-                headers: { Authorization: `Bearer ${token}` },
-            })
+            const data = await apiCall({
+                method: "DELETE",
+                endpoint: 'auth/delete',
+            });
             localStorage.removeItem('authToken');
             navigate('/login');
         }catch (e) {
