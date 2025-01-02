@@ -3,16 +3,16 @@
     const router = express.Router();
     const dotenv = require('dotenv');
     const fetch = require('node-fetch');
-    const jwt = require('jsonwebtoken'); // Import the JWT library
+    const jwt = require('jsonwebtoken');
     const User = require('./models/User');
     const Note = require("./models/Notes");
-    const Todos = require("./models/Todos"); // Import the User model
+    const Todos = require("./models/Todos");
+    const Mark = require("./models/Marks");
     dotenv.config();
 
 
     router.get('/request', (req, res) => {
         const redirectUrl = 'http://localhost:5000/oauth';
-        // const redirectUrl = 'http://localhost:3000/dashboard';
 
         const oAuth2Client = new OAuth2Client(
             process.env.GOOGLE_CLIENT_ID,
@@ -21,7 +21,7 @@
         );
         const authorizeUrl = oAuth2Client.generateAuthUrl({
             access_type: 'offline',
-            scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email openid', // Added email scope
+            scope: 'https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email openid',
             prompt: 'consent',
         });
 
@@ -35,7 +35,7 @@
         }
 
         try {
-            const redirectUrl = 'http://localhost:5000/oauth'; // Your redirect URL
+            const redirectUrl = 'http://localhost:5000/oauth';
             const oAuth2Client = new OAuth2Client(
                 process.env.GOOGLE_CLIENT_ID,
                 process.env.GOOGLE_CLIENT_SECRET,
@@ -65,7 +65,7 @@
                     name: userData.given_name,
                     surname: userData.family_name,
                     country: null,
-                    password: 'googleOAuth',  // You can customize how the password is stored
+                    password: 'googleOAuth',
                     isActive: true,
                 });
                 const defaultNote = new Note({
@@ -88,6 +88,17 @@
                 });
                 newUser.todos.push(defaultTodo);
                 await defaultTodo.save();
+
+                const defaultMark = new Mark({
+                    title: "New Folder",
+                    creator: newUser._id,
+                    marks: [
+                        { link: "https://google.com", title: "Google" },
+                        { link: "https://example.com", title: "Example" },
+                        { link: "https://github.com", title: "GitHub" }
+                    ]
+                });
+                await defaultMark.save();
                 await newUser.save();
 
                 token = jwt.sign(
@@ -97,7 +108,6 @@
                 );
             }
 
-            // Redirect to frontend with the token in the URL
             res.redirect(`http://localhost:3000?token=${token}`);
 
         } catch (err) {

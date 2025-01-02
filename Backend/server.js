@@ -16,8 +16,8 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
-app.use(bodyParser.json()); // For parsing application/json
-app.use(bodyParser.urlencoded({ extended: true })); // For parsing application/x-www-form-urlencoded
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use((error, req, res,next) => {
     console.log(error)
@@ -31,7 +31,6 @@ app.use((error, req, res,next) => {
 })
 
 
-// MongoDB connection and starting the server
 const connectDB = async () => {
     try {
         await mongoose.connect(process.env.MONGO_URI, {

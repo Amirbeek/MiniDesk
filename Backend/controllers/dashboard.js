@@ -2,6 +2,7 @@ const User = require('../models/User');
 const Event = require('../models/Event');
 const Note = require("../models/Notes");
 const Todo = require('../models/Todos')
+const Mark = require('../models/Marks')
 
 exports.getUserInfo = async (req, res) => {
     try {
@@ -10,6 +11,7 @@ exports.getUserInfo = async (req, res) => {
             .populate('events')
             .populate('todos')
             .populate('notes')
+            .populate('marks')
             .lean();
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
@@ -27,6 +29,7 @@ exports.getUserInfo = async (req, res) => {
                 events: user.events,
                 notes: user.notes,
                 todos: user.todos,
+                marks: user.marks,
             },
         });
     } catch (err) {
@@ -306,5 +309,101 @@ exports.DeleteTodo = async function (req, res) {
     } catch (err) {
         console.error('Error deleting todo:', err);
         res.status(500).json({ message: 'Error deleting todo', error: err.message });
+    }
+};
+
+
+exports.PostMark = async function (req, res) {
+    try {
+        const userId = req.user.userId;
+        const { title, marks } = req.body;
+
+        // Validate title
+        if (!title) {
+            return res.status(400).json({ message: 'Title is required' });
+        }
+
+        // Create a new mark
+        const newMark = new Mark({
+            title,
+            marks: marks || [], // Optional: provide marks or use an empty array
+            creator: userId,
+        });
+
+        // Save the mark
+        await newMark.save();
+
+        // Update user's marks
+        const user = await User.findById(userId);
+        user.marks.push(newMark);
+        await user.save();
+
+        res.status(201).json({ message: 'Mark created successfully', mark: newMark });
+    } catch (err) {
+        console.error('Error creating mark:', err);
+        res.status(500).json({ message: "Error creating mark", error: err.message });
+    }
+};
+const mongoose = require('mongoose');
+
+exports.PutMark = async function (req, res) {
+    const userId = req.user.userId;
+    const markId = req.params.markId;
+    const { title, marks } = req.body;
+
+    try {
+        const mark = await Mark.findById(markId);
+        if (!mark) {
+            return res.status(404).json({ message: 'Mark not found' });
+        }
+        if (mark.creator.toString() !== userId) {
+            return res.status(403).json({ message: 'Not authorized to edit this mark' });
+        }
+
+        if (title) mark.title = title;
+
+        if (marks) {
+            mark.marks = marks.map((m) => {
+                if (m._id && typeof m._id === 'string') {
+                    return { ...m, _id: new mongoose.Types.ObjectId(m._id) }; // Convert _id to ObjectId
+                }
+                return m;
+            });
+        }
+
+        // Save the updated mark
+        await mark.save();
+
+        res.status(200).json({ message: 'Mark updated successfully', mark });
+    } catch (err) {
+        console.error('Error updating mark:', err);
+        res.status(500).json({ message: 'Error updating mark', error: err.message });
+    }
+};
+
+exports.DeleteMark = async function (req, res) {
+    try {
+        const userId = req.user.userId;
+        const markId = req.params.markId;
+
+        const mark = await Mark.findById(markId).populate('creator');
+        if (!mark) {
+            return res.status(404).json({ message: 'Mark not found' });
+        }
+
+        if (mark.creator._id.toString() !== userId) {
+            return res.status(403).json({ message: 'Not authorized!' });
+        }
+
+        const user = await User.findById(userId);
+        user.marks.pull(markId);
+        await user.save();
+
+        await Mark.findByIdAndDelete(markId);
+
+        res.status(200).json({ message: 'Mark deleted successfully', markId });
+    } catch (err) {
+        console.error('Error deleting mark:', err);
+        res.status(500).json({ message: 'Error deleting mark', error: err.message });
     }
 };

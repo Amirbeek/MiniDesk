@@ -3,7 +3,7 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import ScrollContainer from "./bookmark_component/ScrollContainer";
 import ItemWrapper from "./bookmark_component/ItemWrapper";
 import AddButton from "./bookmark_component/AddButton";
-import Data from "../data";
+import useApi from "../useApi";
 import MiddleWrapper from "./bookmark_component/MiddleWrapper";
 import BookmarkDialog from "./bookmark_component/BookmarkDialog";
 import InputMarkChange from "./bookmark_component/InputMarkChange";
@@ -12,26 +12,24 @@ import { EditHomePageContext } from "./EditHomePage";
 import "../index.css";
 import BookMark from "./BookMark";
 import AddBookmarkDialog from "./bookmark_component/AddBookmarkDialog";
-/*Simple of data
-*          {
-        "_id": "1",
-        "title": "Sample BookMark 1",
-        "marks": [
-            { "_id": "1-1", "link": "https://google.com", "title": "Google" },
-            { "_id": "1-2", "link": "https://example.com", "title": "Example" },
-            { "_id": "1-3", "link": "https://github.com", "title": "GitHub" }
-        ]
-    },
-*
-* */
-const HorizontalScrollBox = () => {
-    const [mark, setMark] = useState(Data);
+
+
+const HorizontalScrollBox = ({marks}) => {
+    const [mark, setMark] = useState(marks);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [dialogItemOpen, setDialogItemOpen] = useState(false);
     const [newTitle, setNewTitle] = useState("");
-    const [selectedMark, setSelectedMark] = useState(Data[0]);
+    const [selectedMark, setSelectedMark] = useState(mark[0]);
     const [editingMark, setEditingMark] = useState(false);
     const { editMode, setEditMode } = useContext(EditHomePageContext);
+    const apiCall = useApi();
+    /*
+     const data = await apiCall({
+                endpoint: 'marks',
+                method: 'POST',
+                body: newMark,
+            });
+    * */
 
     const resetSelection = useCallback(() => {
         setSelectedMark(null);
@@ -41,17 +39,52 @@ const HorizontalScrollBox = () => {
 
     const handleCloseDialog = useCallback(() => setDialogOpen(false), []);
 
-    const handleAddMark = useCallback(() => {
+    const handleAddMark = useCallback(async () => {
         if (!newTitle) return;
-        const newMark = { _id: Date.now().toString(), title: newTitle, marks: [] };
-        setMark((prevMarks) => [...prevMarks, newMark]);
-        setDialogOpen(false);
-    }, [newTitle]);
 
-    const handleDeleteMark = useCallback((id) => {
-        setMark((prevMarks) => prevMarks.filter((item) => item._id !== id));
-        resetSelection();
-    }, [resetSelection]);
+        try {
+            const newMark = { title: newTitle, marks: [] };
+            const data = await apiCall({
+                endpoint: 'mark',
+                method: 'POST',
+                body: newMark,
+            });
+            setMark((prevMarks) => [...prevMarks, data.mark]);
+            setDialogOpen(false);
+        } catch (error) {
+            console.error('Error adding mark:', error.message);
+        }
+    }, [newTitle, apiCall]);
+
+    const handleDeleteMark = useCallback(
+        async (id) => {
+            try {
+                await apiCall({
+                    endpoint: `mark/${id}`,
+                    method: 'DELETE',
+                });
+
+                setMark((prevMarks) => {
+                    const updatedMarks = prevMarks.filter((item) => item._id !== id);
+                    if (selectedMark && selectedMark._id === id) {
+                        setSelectedMark(updatedMarks.length > 0 ? updatedMarks[0] : null);
+                    }
+
+                    return updatedMarks;
+                });
+
+                if (selectedMark && selectedMark._id === id) {
+                    resetSelection();
+                }
+            } catch (error) {
+                console.error('Error deleting mark:', error.message);
+            }
+        },
+        [apiCall, selectedMark, resetSelection]
+    );
+
+
+
 
     const handleOpenDialog = useCallback(() => {
         setDialogOpen(true);
@@ -110,59 +143,94 @@ const HorizontalScrollBox = () => {
     };
 
 
-    const handleAddBookmark = ({ title, url, parentBookmarkTitle }) => {
-        setMark((prevMarks) => {
-            return prevMarks.map((bookmark) => {
-                if (bookmark._id === parentBookmarkTitle) {
-                    const updatedBookmark = {
-                        ...bookmark,
-                        marks: [
-                            ...bookmark.marks,
-                            { _id: Date.now().toString(), link: url, title: title }
-                        ]
-                    };
-                    setSelectedMark(updatedBookmark);
-                    return updatedBookmark;
-                }
-                return bookmark;
-            });
-        });
-    };
+    const handleAddBookmark = async ({ title, url, parentBookmarkTitle }) => {
+        try {
+            const parentMark = mark.find((bookmark) => bookmark._id === parentBookmarkTitle);
 
-    const handleDeleteBookmark = (id) => {
-        console.log('Selected Mark:', selectedMark);
+            const newBookmark = { link: url, title };
 
-        setMark((prevMarks) => {
-            const deleteRecursive = (bookmarks) => {
-                return bookmarks.filter((bookmark) => bookmark._id !== id)
-                    .map((bookmark) => ({
-                        ...bookmark,
-                        marks: deleteRecursive(bookmark.marks || [])
-                    }));
+            const updatedParentMark = {
+                ...parentMark,
+                marks: [...parentMark.marks, newBookmark],
             };
 
-            const updatedMarks = deleteRecursive(prevMarks);
+            const data = await apiCall({
+                endpoint: `mark/${parentBookmarkTitle}`,
+                method: 'PUT',
+                body: updatedParentMark,
+            });
 
-            if (selectedMark && selectedMark._id === id) {
-                setSelectedMark(null);
-            } else if (selectedMark) {
-                const findNewSelected = (bookmarks) => {
-                    for (let bookmark of bookmarks) {
-                        if (bookmark._id === selectedMark._id) {
-                            return bookmark;
-                        }
-                        const foundInChild = findNewSelected(bookmark.marks || []);
-                        if (foundInChild) return foundInChild;
-                    }
-                    return null;
-                };
-                const newSelected = findNewSelected(updatedMarks);
-                setSelectedMark(newSelected);
-            }
+            setMark((prevMarks) =>
+                prevMarks.map((bookmark) =>
+                    bookmark._id === parentBookmarkTitle ? data.mark : bookmark
+                )
+            );
 
-            return updatedMarks;
-        });
+            const updatedSelectedMark = data.mark;
+            setSelectedMark(updatedSelectedMark);
+        } catch (error) {
+            console.error('Error adding bookmark:', error.message);
+        }
     };
+
+    const handleDeleteBookmark = async (id) => {
+        console.log('Selected Mark:', selectedMark);
+        try {
+            setMark((prevMarks) => {
+                const deleteRecursive = (bookmarks) => {
+                    return bookmarks
+                        .filter((bookmark) => bookmark._id !== id)
+                        .map((bookmark) => ({
+                            ...bookmark,
+                            marks: deleteRecursive(bookmark.marks || []),
+                        }));
+                };
+
+                const updatedMarks = deleteRecursive(prevMarks);
+
+                if (selectedMark && selectedMark._id === id) {
+                    setSelectedMark(null);
+                } else if (selectedMark) {
+                    const findNewSelected = (bookmarks) => {
+                        for (let bookmark of bookmarks) {
+                            if (bookmark._id === selectedMark._id) {
+                                return bookmark;
+                            }
+                            const foundInChild = findNewSelected(bookmark.marks || []);
+                            if (foundInChild) return foundInChild;
+                        }
+                        return null;
+                    };
+                    const newSelected = findNewSelected(updatedMarks);
+                    setSelectedMark(newSelected);
+                }
+
+                (async () => {
+                    try {
+                        const updatedParentMark = {
+                            ...selectedMark,
+                            marks: deleteRecursive(selectedMark.marks || []),
+                        };
+
+                        const data = await apiCall({
+                            endpoint: `mark/${selectedMark._id}`,
+                            method: 'PUT',
+                            body: updatedParentMark,
+                        });
+
+                        setSelectedMark(data.mark);
+                    } catch (error) {
+                        console.error('Error updating marks:', error.message);
+                    }
+                })();
+
+                return updatedMarks;
+            });
+        } catch (error) {
+            console.error('Error deleting bookmark:', error.message);
+        }
+    };
+
 
     return (
         <>

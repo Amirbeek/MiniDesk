@@ -17,7 +17,8 @@ const UserSchema = new mongoose.Schema(
         resetPasswordToken: { type: String, default: null },
         events: [{ type: Schema.Types.ObjectId, ref: 'Event' }],
         notes:[{type: Schema.Types.ObjectId, ref: 'Notes'}],
-        todos: [{ type: Schema.Types.ObjectId, ref: 'Todos' }]
+        todos: [{ type: Schema.Types.ObjectId, ref: 'Todos' }],
+        marks: [{ type: Schema.Types.ObjectId, ref: 'Marks' }],
     },
     { timestamps: true }
 );

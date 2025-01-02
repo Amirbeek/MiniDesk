@@ -44,6 +44,8 @@ const Dashboard = () => {
                     method: 'GET',
                 });
                 setUserData(data.user);
+                console.log('dashboard data', data.user);
+
             } catch (error) {
                 console.error('Failed to fetch dashboard data', error);
                 if (error.message.includes('Unauthorized')) {
@@ -56,7 +58,7 @@ const Dashboard = () => {
 
     const handleBackgroundClick = (event) => {
         if (event.target === event.currentTarget) {
-            setEditMode(!editMode);
+            setEditMode(false);
         }
     };
     const handleGridClick = (event) => {
@@ -72,8 +74,7 @@ const Dashboard = () => {
                         <NewNavbar UserInfo={userData} />
                         <Grid container spacing={2}>
                             <Grid item xs={12} sm={4} md={8 } onClick={handleGridClick} >
-                                <ScrollBox editMode={editMode} />
-
+                                <ScrollBox editMode={editMode} marks={userData['marks']}/>
                             </Grid>
                             <Grid item xs={12} sm={8} md={4} sx={{ padding: 5 }} onClick={handleGridClick}>
                                 <Grid container spacing={2}>

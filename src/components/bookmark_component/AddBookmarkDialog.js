@@ -32,7 +32,8 @@ const AddBookmarkDialog = ({ open, setDialogOpen, handleAddBookmark, bookmarks, 
             return;
         }
         const formattedUrl = formatUrl(url);
-        handleAddBookmark({ title, url: formattedUrl, parentBookmarkTitle: selectedBookmark });
+        console.log(selectedBookmark)
+        handleAddBookmark({title, url: formattedUrl, parentBookmarkTitle: selectedBookmark });
         setTitle('');
         setUrl('');
         setDialogOpen(false);

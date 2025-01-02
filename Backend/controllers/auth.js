@@ -6,6 +6,7 @@ const myEmail = process.env.My_Email;
 const password = process.env.MyPassword;
 const Note = require('../models/Notes');
 const Todos = require('../models/Todos');
+const Mark = require('../models/Marks');
 
 
 // this code has to be added for each controller methods
@@ -24,64 +25,85 @@ const transport = nodemailer.createTransport({
 });
 
 exports.postSignup = async (req, res) => {
-        const { username, email, name, surname, country, password } = req.body;
-        try {
-            const existingUser = await User.findOne({ $or: [{ username }, { email }] });
-            if (existingUser) {
-                return res.status(400).json({ message: 'Username or email already taken' });
-            }
-            const user = new User({
-                username,
-                email,
-                name,
-                surname,
-                country,
-                password,
-                isActive: false,
-            });
-
-            const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
-            user.activationToken = token;
-
-            const defaultNote = new Note({
-                title: 'Your Node',
-                content:[],
-                creator: user._id,
-            })
-            user.notes.push(defaultNote);
-            await defaultNote.save();
-
-
-            const defaultTodo = new Todos({
-                title: 'Your Todo',
-                creator: user._id,
-                todos: [
-                    { text: 'Set up your first task', done: false },
-                    { text: 'Complete your first todo item', done: false },
-                    { text: 'Explore the platform features', done: false }
-                ]
-            });
-            user.todos.push(defaultTodo);
-            await defaultTodo.save();
-
-            await user.save();
-
-            await transport.sendMail({
-                from: myEmail,
-                to: email,
-                subject: 'Activate your account',
-                html: `
-                    <h1>Welcome to Our Platform</h1>
-                    <p>Please click the link below to activate your account:</p>
-                    <a href="${process.env.CLIENT_URL}/activate/${token}">Activate Account</a>
-                `,
-            });
-            return res.status(201).json({ message: 'Signup successful! Check your email to activate your account.', token });
-        } catch (error) {
-            console.error('Error during signup:', error);
-            return res.status(500).json({ message: 'Something went wrong. Please try again later.' });
+    const { username, email, name, surname, country, password } = req.body;
+    try {
+        const existingUser = await User.findOne({ $or: [{ username }, { email }] });
+        if (existingUser) {
+            return res.status(400).json({ message: 'Username or email already taken' });
         }
-    };
+
+        // Create the user object
+        const user = new User({
+            username,
+            email,
+            name,
+            surname,
+            country,
+            password,
+            isActive: false,
+        });
+
+        // Save the user to generate the _id
+        await user.save();
+        console.log("NEW USER _ID:", user._id);
+
+        // Create and save default Note
+        const defaultNote = new Note({
+            title: 'Your Note',
+            content: [],
+            creator: user._id,
+        });
+        await defaultNote.save();
+        user.notes.push(defaultNote);
+
+        // Create and save default Todo
+        const defaultTodo = new Todos({
+            title: 'Your Todo',
+            creator: user._id,
+            todos: [
+                { text: 'Set up your first task', done: false },
+                { text: 'Complete your first todo item', done: false },
+                { text: 'Explore the platform features', done: false },
+            ],
+        });
+        await defaultTodo.save();
+        user.todos.push(defaultTodo);
+
+        const defaultMark = new Mark({
+            title: "New Folder",
+            marks: [
+                { link: "https://google.com", title: "Google" },
+                { link: "https://Yandex.ru", title: "Yandex" },
+                { link: "https://github.com", title: "GitHub" },
+            ],
+            creator: user._id,
+        });
+        console.log("MARK,",defaultMark);
+        await defaultMark.save();
+        user.marks.push(defaultMark);
+
+        await user.save();
+
+        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+        user.activationToken = token;
+
+        await transport.sendMail({
+            from: myEmail,
+            to: email,
+            subject: 'Activate your account',
+            html: `
+                <h1>Welcome to Our Platform</h1>
+                <p>Please click the link below to activate your account:</p>
+                <a href="${process.env.CLIENT_URL}/activate/${token}">Activate Account</a>
+            `,
+        });
+
+        return res.status(201).json({ message: 'Signup successful! Check your email to activate your account.', token });
+    } catch (error) {
+        console.error('Error during signup:', error);
+        return res.status(500).json({ message: 'Something went wrong. Please try again later.' });
+    }
+};
 
 
 exports.postLogin = async (req, res) => {
