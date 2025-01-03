@@ -4,7 +4,6 @@ import { Grid } from '@mui/material';
 import Bimage from '../background_images/Bimage.png';
 import { useNavigate } from 'react-router-dom';
 
-// Define the styled components outside the main component for better performance and structure
 const GoogleButtonStyle = styled.button`
     padding: 10px;
     font-weight: bolder;
