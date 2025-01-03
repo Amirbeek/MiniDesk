@@ -6,6 +6,10 @@ const Wrapper = styled.div`
     height: 150px;
     background-color: hsla(0,0%,100%,.6);
     border-radius: 10px;
+    transition: .2s ease-in-out;
+    &:hover {
+        background-color: hsla(0, 0%, 100%, 0.78);
+    }
 `
 const Header = styled.header`
     background-color: #e77f23;
@@ -14,10 +18,8 @@ const Header = styled.header`
     color: white;
     border-radius: 10px 10px 0 0 ;
     font-weight: 500;
-    box-sizing: border-box; 
-    
+    box-sizing: border-box;
     text-align: left;
-
 `
 const Body = styled.div`
     text-align: left;
@@ -32,9 +34,12 @@ function ComponentButton({header='To Do', HeaderColor, children }){
             <Header style={{backgroundColor: HeaderColor}}>
                 {header}
             </Header>
-            <Body>
-                {children}
-            </Body>
+            <div>
+                <Body>
+                    {children}
+                </Body>
+            </div>
+
         </Wrapper>
     </>
 }

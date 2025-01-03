@@ -23,14 +23,6 @@ const HorizontalScrollBox = ({marks}) => {
     const [editingMark, setEditingMark] = useState(false);
     const { editMode, setEditMode } = useContext(EditHomePageContext);
     const apiCall = useApi();
-    /*
-     const data = await apiCall({
-                endpoint: 'marks',
-                method: 'POST',
-                body: newMark,
-            });
-    * */
-
     const resetSelection = useCallback(() => {
         setSelectedMark(null);
         setEditingMark(false);
@@ -124,6 +116,7 @@ const HorizontalScrollBox = ({marks}) => {
         [mark]
     );
     const onDragEndItems = (result) => {
+        console.log(result)
         const { source, destination } = result;
         if (!destination) return;
         const reorderedMarks = Array.from(selectedMark.marks);

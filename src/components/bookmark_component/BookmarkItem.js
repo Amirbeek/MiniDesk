@@ -39,7 +39,7 @@ const SingleBookMark = styled.div`
 
     & small {
         font-weight: bold;
-        text-shadow: 0px 1px 3px #000;
+        text-shadow: 0 1px 3px #000;
     }
 `;
 

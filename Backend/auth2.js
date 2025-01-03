@@ -99,6 +99,7 @@
                     ]
                 });
                 await defaultMark.save();
+                newUser.marks.push(defaultMark);
                 await newUser.save();
 
                 token = jwt.sign(

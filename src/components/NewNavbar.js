@@ -2,59 +2,93 @@ import * as React from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
-import InputBase from '@mui/material/InputBase';
 import SearchIcon from '@mui/icons-material/Search';
-import { alpha, styled } from '@mui/material/styles';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import Settings from "./Settings";
-import {useContext} from "react";
+import {useContext, useState} from "react";
 import {EditHomePageContext} from "./EditHomePage";
+import EditBackgroundImage from "./EditBackgroundImage";
+import styled from "styled-components";
+import UnicornIcon from "./widget_component/Unicorn";
 
-const Search = styled('div')(({ theme }) => ({
-    position: 'relative',
-    borderRadius: theme.shape.borderRadius,
-    backgroundColor: alpha(theme.palette.common.white, 0.15),
-    '&:hover': {
-        backgroundColor: alpha(theme.palette.common.white, 0.25),
-    },
-    marginRight: theme.spacing(2),
-    marginLeft: 0,
-    width: '100%',
-    [theme.breakpoints.up('sm')]: {
-        marginLeft: theme.spacing(3),
-        width: 'auto',
-    },
-}));
+const SettingButton =  styled.button`
+    background-color: hsla(0, 0%, 100%, .4);
+    border: 1px solid hsla(0, 0%, 100%, .2);
+    box-shadow: 0 0 .5rem 0 rgba(0, 0, 0, .1);
+    border-radius: 15px;
+    color: #4F4F4F;
+    padding: 0.7rem .8rem .5rem .8rem;
+    &:active {
+        background-color: hsla(0, 0%, 100%, 0.75);
+    }
 
-const SearchIconWrapper = styled('div')(({ theme }) => ({
-    padding: theme.spacing(0, 2),
-    height: '100%',
-    position: 'absolute',
-    pointerEvents: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-}));
+    &:hover {
+        background-color: hsla(0, 0%, 100%, 0.75);
+    }
+`
 
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-    color: 'inherit',
-    '& .MuiInputBase-input': {
-        padding: theme.spacing(1.5, 2, 1.5, 0),
-        paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-        transition: theme.transitions.create('width'),
-        width: '100%',
-        [theme.breakpoints.up('md')]: {
-            width: '60ch',
-        },
-    },
-}));
+const SearchParentWrapper = styled(Box)`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50%;
+    background-color: hsla(0, 0%, 100%, 0.58);
+    border-radius: 15px;
+    overflow: clip;
+    box-sizing: border-box
+`
+const SearchButton =styled.span`
+    height: 100%;
+    padding: 10px 5px 10px 15px;
+    width: 50px;
+    transition: .3s;
+    cursor: pointer;
+    &:hover{
+        background-color: hsla(0, 0%, 100%, .10);
+    }
+`
+const SearchInput = styled.input`
+    padding: 12px 16px;
+    width: 100%;
+    border-radius: 15px 0 0 15px;
+    border: none; 
+    background-color: transparent;
+    color: #4F4F4F;
+    font-size: 1rem; 
+    outline: none; 
+    box-shadow: none;
+    -webkit-appearance: none; 
+    -moz-appearance: none;
+    appearance: none;
 
-export default function MenuAppBar({ UserInfo }) {
+    &::placeholder {
+        color: #4F4F4F; 
+        font-size: 0.9rem; 
+    }
+
+    &:focus {
+        color: #000; 
+    }
+`;
+
+
+export default function MenuAppBar({ UserInfo ,setUserInfo}) {
     const { editMode, setEditMode} = useContext(EditHomePageContext);
+    const [query, setQuery] = useState('');
 
+    const handleSearch = () => {
+        if (query.trim()) {
+            window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, '_blank');
+        }
+    };
+
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            handleSearch();
+        }
+    };
     const handelOffEditMode = ()=>{
             setEditMode(true)
             console.log(editMode)
@@ -82,23 +116,46 @@ export default function MenuAppBar({ UserInfo }) {
             <AppBar position="static"  sx={{ backgroundColor: 'transparent', boxShadow: 'none', padding: '10px' }}>
                 <Toolbar onClick={handelOffEditModee} sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                     <Box sx={{ position: 'absolute', left: 20 }}>
-                       Appp
+                        <SettingButton
+                            size="large"
+                            aria-label="Setting"
+                            aria-controls="menu-appbar"
+                            aria-haspopup="true"
+                            color="inherit"
+                        >
+                            <div class={'hop'}>
+                                <UnicornIcon />
+                            </div>
+                        </SettingButton>
                     </Box>
 
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <Search>
-                            <SearchIconWrapper>
-                                <SearchIcon />
-                            </SearchIconWrapper>
-                            <StyledInputBase
-                                placeholder="Search…"
-                                inputProps={{ 'aria-label': 'search' }}
-                            />
-                        </Search>
-                    </Box>
+                    <SearchParentWrapper>
+                        <SearchInput
+                            type="text"
+                            value={query}
+                            onChange={(e) => setQuery(e.target.value)}
+                            onKeyDown={handleKeyPress}
+                            placeholder="Search"
+                        />
+                        <SearchButton>
+                            <SearchIcon
+                                onClick={handleSearch}
+                                sx={{
+                                    color: '#666',
+                                    fontSize: '24px',
+                                    cursor: 'pointer',
+                                    transition: 'color 0.3s',
+                                    margin:'auto',
+                                    '&:hover': {
+                                        color: '#333',
+                                    },
+                                }}/>
+                        </SearchButton>
+                    </SearchParentWrapper>
 
-                    <Box sx={{ position: 'absolute', right: 20 }}>
-                        <IconButton
+
+                    <Box sx={{position: 'absolute', right: 20}}>
+                        <SettingButton
                             size="large"
                             aria-label="Setting"
                             aria-controls="menu-appbar"
@@ -106,8 +163,10 @@ export default function MenuAppBar({ UserInfo }) {
                             onClick={handleMenu}
                             color="inherit"
                         >
-                            <SettingsOutlinedIcon />
-                        </IconButton>
+                            <div class={'hop'}>
+                                <SettingsOutlinedIcon />
+                            </div>
+                        </SettingButton>
                         <Menu
                             id="menu-appbar"
                             anchorOrigin={{
@@ -123,7 +182,7 @@ export default function MenuAppBar({ UserInfo }) {
                             onClose={handleClose}
                         >
                             <Settings UserInfo={UserInfo} />
-                            <MenuItem onClick={handleClose}>Profile</MenuItem>
+                            <EditBackgroundImage UserInfo={UserInfo} setUserInfo={setUserInfo} />
                             <MenuItem
                                 onClick={() => {
                                     handelOffEditMode();

@@ -2,9 +2,9 @@ import React from 'react';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
+import DialogHeader from "../widget_component/DialogHeader";
 
 function BookmarkDialog({ open, onClose, onSubmit, title, setTitle }) {
     const handleCancel = () => {
@@ -24,7 +24,7 @@ function BookmarkDialog({ open, onClose, onSubmit, title, setTitle }) {
                 style: { width: '400px', maxWidth: 'none' },
             }}
         >
-            <DialogTitle>Add New Bookmark</DialogTitle>
+            <DialogHeader onClose={handleCancel} title={'Add New Bookmark'}/>
             <DialogContent>
                 <TextField
                     autoFocus
@@ -37,9 +37,6 @@ function BookmarkDialog({ open, onClose, onSubmit, title, setTitle }) {
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     sx={{
-                        '& .MuiInputBase-root': {
-                            backgroundColor: '#f9f9f9',
-                        },
                         '& .MuiInputLabel-root': {
                             color: '#666',
                         },

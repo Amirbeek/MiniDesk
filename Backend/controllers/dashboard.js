@@ -30,6 +30,7 @@ exports.getUserInfo = async (req, res) => {
                 notes: user.notes,
                 todos: user.todos,
                 marks: user.marks,
+                backgroundImage:user.backgroundImage
             },
         });
     } catch (err) {
@@ -37,6 +38,36 @@ exports.getUserInfo = async (req, res) => {
         res.status(500).json({ message: 'Error fetching dashboard data', error: err.message });
     }
 };
+
+exports.PutBackgroundImage = async (req, res) => {
+    try {
+        const userId = req.user.userId;
+        const { backgroundImage } = req.body;
+        if (!backgroundImage || typeof backgroundImage !== 'string') {
+            return res.status(400).json({ message: 'Invalid or missing backgroundImage' });
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        user.backgroundImage = backgroundImage;
+        await user.save();
+
+        res.status(200).json({
+            message: 'Successfully updated background image!',
+            backgroundImage,
+        });
+    } catch (err) {
+        console.error('Error updating user background image:', err);
+        res.status(500).json({
+            message: 'Failed to update user background image',
+            error: err.message,
+        });
+    }
+};
+
 exports.postEvent = async (req, res) => {
     const userId = req.user.userId; // Assuming `userId` is available from authentication middleware
     const { subject, location, description, startTime, endTime, isAllDay, repeat, customRepeatInterval, timezone } = req.body;
@@ -365,13 +396,12 @@ exports.PutMark = async function (req, res) {
         if (marks) {
             mark.marks = marks.map((m) => {
                 if (m._id && typeof m._id === 'string') {
-                    return { ...m, _id: new mongoose.Types.ObjectId(m._id) }; // Convert _id to ObjectId
+                    return { ...m, _id: new mongoose.Types.ObjectId(m._id) };
                 }
                 return m;
             });
         }
 
-        // Save the updated mark
         await mark.save();
 
         res.status(200).json({ message: 'Mark updated successfully', mark });

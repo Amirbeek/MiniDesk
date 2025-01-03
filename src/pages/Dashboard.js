@@ -10,7 +10,7 @@ import ScrollBox from "../components/ScrollBox";
 import { EditHomePageContext } from "../components/EditHomePage";
 
 const BackImage = styled.div`
-    background: url("https://w0.peakpx.com/wallpaper/236/488/HD-wallpaper-mac-os-ventura-dark-macos-ventura-macbook-apple-computer.jpg") no-repeat center center;
+    background: ${(props) => `url("${props.imageUrl}") no-repeat center center`};
     background-size: cover;
     min-height: 100vh;
     position: relative;
@@ -30,6 +30,7 @@ const BackImage = styled.div`
         z-index: 2;
     }
 `;
+
 
 const Dashboard = () => {
     const [userData, setUserData] = useState(null);
@@ -68,10 +69,14 @@ const Dashboard = () => {
     };
     return (
         <div>
-            <BackImage editMode={editMode} onClick={handleBackgroundClick}>
+            <BackImage
+                editMode={editMode}
+                onClick={handleBackgroundClick}
+                imageUrl={userData?.backgroundImage }
+            >
                 {userData ? (
                     <div style={{ position: 'relative' }}  >
-                        <NewNavbar UserInfo={userData} />
+                        <NewNavbar UserInfo={userData} setUserInfo={setUserData}/>
                         <Grid container spacing={2}>
                             <Grid item xs={12} sm={4} md={8 } onClick={handleGridClick} >
                                 <ScrollBox editMode={editMode} marks={userData['marks']}/>

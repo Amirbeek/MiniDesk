@@ -23,8 +23,8 @@ const BookmarkGrid = ({ onDelete, marks, onDragEnd, setOpenAddItemDialog }) => {
     };
 
     return (
-        <DragDropContext onDragEnd={editMode ? onDragEnd : undefined}>
-            <Droppable droppableId="bookmarks" direction="horizontal" isDropDisabled={!editMode}>
+        <DragDropContext onDragEnd={onDragEnd}>
+            <Droppable droppableId="bookmarks" direction="horizontal" >
                 {(provided) => (
                     <Grid
                         container
@@ -35,7 +35,7 @@ const BookmarkGrid = ({ onDelete, marks, onDragEnd, setOpenAddItemDialog }) => {
                         onClick={handleGridClick}
                     >
                         {marks.map((bookmark, index) => (
-                            <Draggable key={bookmark._id} draggableId={bookmark._id} index={index} isDragDisabled={!editMode}>
+                            <Draggable key={bookmark._id} draggableId={bookmark._id} index={index} >
                                 {(provided) => (
                                     <Grid
                                         item

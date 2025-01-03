@@ -19,6 +19,7 @@ const UserSchema = new mongoose.Schema(
         notes:[{type: Schema.Types.ObjectId, ref: 'Notes'}],
         todos: [{ type: Schema.Types.ObjectId, ref: 'Todos' }],
         marks: [{ type: Schema.Types.ObjectId, ref: 'Marks' }],
+        backgroundImage: {type: String, default: "https://w0.peakpx.com/wallpaper/236/488/HD-wallpaper-mac-os-ventura-dark-macos-ventura-macbook-apple-computer.jpg"},
     },
     { timestamps: true }
 );

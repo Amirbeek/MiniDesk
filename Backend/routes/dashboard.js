@@ -26,4 +26,8 @@ router.post('/mark', authenticate, dashboard.PostMark);
 router.put('/mark/:markId', authenticate, dashboard.PutMark);
 router.delete('/mark/:markId', authenticate, dashboard.DeleteMark);
 
+
+// Background Image
+router.put('/image',authenticate, dashboard.PutBackgroundImage)
+
 module.exports = router;

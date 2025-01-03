@@ -7,20 +7,53 @@ function Todo({ todosData,onChangeMode }) {
     const handleClickOpen = () => {
         setOpen(true);
     };
-
+    let count = 0;
     const Component_data = (
-        <>
-            {Array.isArray(todosData) && todosData[0].todos.map((todoGroup, index) => (
-                <React.Fragment key={index}>
-                    {todoGroup.title}
-                </React.Fragment>
-            ))}
-            {Array.isArray(todosData) && todosData.length > 4 && (
-                <span style={{ cursor: "pointer" }}>
-                    ...and {todosData.length - 4} more
-                </span>
-            )}
-        </>
+        <div>
+            {Array.isArray(todosData) &&
+                todosData[0].todos.map((todoGroup, index) => {
+                   if (!todoGroup.done && count < 4){
+                       count++
+                       return (
+                           <React.Fragment key={index}>
+                               <div style={{display: "flex"}}>
+                                   <input
+                                       type="checkbox"
+                                       style={{
+                                           width: '18px',
+                                           height: '18px',
+                                           appearance: 'none',
+                                           WebkitAppearance: 'none',
+                                           MozAppearance: 'none',
+                                           backgroundColor: 'transparent',
+                                           border: '3px solid #4f4f4f',
+                                           borderRadius: '4px',
+                                           position: 'relative',
+                                           marginTop:"auto",
+                                           cursor: 'pointer',
+                                       }}
+                                       onClick={handleClickOpen}
+                                   />
+
+                                   <span style={{
+                                       display: "block",
+                                       whiteSpace: "nowrap",
+                                       overflow: "hidden",
+                                       textOverflow: "ellipsis",
+                                       maxWidth: "100%",
+                                       marginTop:"2px"
+                                   }}>
+                                {todoGroup.text}
+                            </span>
+
+                               </div>
+                           </React.Fragment>
+                       );
+                   }
+                })
+            }
+            {count <= 4 && <span style={{marginLeft: 10}}>More...</span>}
+        </div>
     );
 
     return (
@@ -36,7 +69,7 @@ function Todo({ todosData,onChangeMode }) {
                 onClick={() => { handleClickOpen(); onChangeMode(false)}}
 
             >
-                <ComponentButton header={'To Do'} HeaderColor={'#333'} children={Component_data} />
+                <ComponentButton header={'To Do List'} HeaderColor={'#333'} children={Component_data} />
             </button>
 
             <TodosWindow
