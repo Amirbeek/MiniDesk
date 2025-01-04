@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { Dialog, DialogContent, DialogActions, DialogTitle, Button, TextField, Select, MenuItem, Typography, FormControl, InputLabel } from '@mui/material';
 import { EditHomePageContext } from "../EditHomePage";
+import DialogHeader from "../widget_component/DialogHeader";
 
 const AddBookmarkDialog = ({ open, setDialogOpen, handleAddBookmark, bookmarks, selectedMarks }) => {
     const [title, setTitle] = useState('');
@@ -39,12 +40,15 @@ const AddBookmarkDialog = ({ open, setDialogOpen, handleAddBookmark, bookmarks, 
         setDialogOpen(false);
         setEditMode(false);
     };
+    const handleCancel = ()=>{
+        setDialogOpen(false);
+        setEditMode(false);
+    }
 
     return (
         <Dialog open={open} onClose={() => { setDialogOpen(false); setEditMode(false); }} fullWidth maxWidth="sm">
-            <DialogTitle>
-                <Typography variant="h6" color="primary">Add New Bookmark</Typography>
-            </DialogTitle>
+            <DialogHeader onClose={handleCancel} title={'Add New Bookmark'}/>
+
             <DialogContent>
                 <FormControl fullWidth margin="normal">
                     <TextField
@@ -71,8 +75,7 @@ const AddBookmarkDialog = ({ open, setDialogOpen, handleAddBookmark, bookmarks, 
                         labelId="parent-bookmark-select-label"
                         id="parent-bookmark-select"
                         value={selectedBookmark}
-                        onChange={handleChange}
-                    >
+                        onChange={handleChange}>
                         {bookmarks.map((bookmark) => (
                             <MenuItem key={bookmark._id} value={bookmark._id}>
                                 {bookmark.title}
@@ -82,7 +85,7 @@ const AddBookmarkDialog = ({ open, setDialogOpen, handleAddBookmark, bookmarks, 
                 </FormControl>
             </DialogContent>
             <DialogActions>
-                <Button onClick={() => { setDialogOpen(false); setEditMode(false); }} color="primary">
+                <Button onClick={handleCancel} color="primary">
                     Cancel
                 </Button>
                 <Button onClick={handleAddClick} variant="contained" color="primary">

@@ -11,7 +11,7 @@ const GoogleButtonStyle = styled.button`
     color: #5e17eb;
     gap: 6px;
     border: 2px solid #5e17eb;
-    border-radius: 0px;
+    border-radius: 0;
     transition: background-color 0.3s, color 0.3s;
     background-color: transparent;
 

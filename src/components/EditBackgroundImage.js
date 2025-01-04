@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Modal, Box, Button, MenuItem, TextField, Grid } from '@mui/material';
+import { Modal, Box, Button, MenuItem, TextField } from '@mui/material';
 import styled from 'styled-components';
-import { createApi } from 'unsplash-js'; // Import Unsplash JS library
+import { createApi } from 'unsplash-js';
 import useApi from '../useApi';
 import DialogHeader from "./widget_component/DialogHeader";
 
