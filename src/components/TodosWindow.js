@@ -1,4 +1,4 @@
-import React, { useState, forwardRef } from "react";
+import React, { useState } from "react";
 import { Dialog, DialogContent, TextField, List, ListItem, Divider, Checkbox } from "@mui/material";
 import { XCircle, Trash } from "react-feather";
 import AddNew from "./widget_component/AddNew";
