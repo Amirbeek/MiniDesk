@@ -238,7 +238,7 @@ const HorizontalScrollBox = ({marks}) => {
     return (
         <>
             {selectedMark && (
-                <BookMark marks={selectedMark ? selectedMark.marks : []}
+                <BookMark marks={selectedMark.marks}
                           onDragEnd={onDragEndItems}
                           setOpenAddItemDialog={setDialogItemOpen}
                           onDelete={handleDeleteBookmark}/>

@@ -12,9 +12,7 @@ function Note({notesData,onChangeMode}) {
     const Component_data = (
         <>
             {notesData.slice(0, 4).map((note, index) => (
-                <>
-                    <span key={index}>{note.title}</span><br/>
-                </>
+                    <span key={index}>{note.title}</span>
             ))}
             {notesData.length > 4 && (
                 <span style={{  cursor: "pointer" }}>

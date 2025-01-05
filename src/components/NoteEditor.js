@@ -30,7 +30,7 @@ const StyleButton = styled.button`
     padding: 5px 10px;
     font-size: 14px;
     cursor: pointer;
-    background-color: ${(props) => (props.active ? "#fff" : "#fff")};
+    background-color: #fff;
     color: ${(props) => (props.active ? "#e77f23" : "#666")};
     font-weight: ${(props) => (props.active ? "bold" : "normal")};
     &:hover{

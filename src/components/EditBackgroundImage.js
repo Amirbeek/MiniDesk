@@ -92,7 +92,7 @@ const EditBackgroundImage = ({ UserInfo, setUserInfo }) => {
         }
         console.log(selectedImage)
         try {
-            const data = await apiCall({
+            await apiCall({
                 method: 'PUT',
                 endpoint: 'image',
                 body: { backgroundImage: selectedImage },
@@ -143,17 +143,12 @@ const EditBackgroundImage = ({ UserInfo, setUserInfo }) => {
                     <ImageWrapper>
                         {imageResults.map((image) => {
                             return(
-                                <>
                                     <ImageCard
                                         key={image.id}
                                         style={{backgroundImage: `url(${image.urls.small})`}}
                                         isSelected={selectedImage === image.urls.full}
                                         onClick={()=>handleSetBackground(image.urls.full)}
                                     />
-
-                                </>
-
-
                             )
                         })}
                     </ImageWrapper>
