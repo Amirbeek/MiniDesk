@@ -3,15 +3,15 @@ import { useNavigate } from 'react-router-dom';
 
 const useApi = () => {
     const navigate = useNavigate();
+    const URL = process.env.REACT_APP_BACKEND_URL ;
     const token = localStorage.getItem("authToken");
-
     const apiCall = useCallback(async ({ endpoint, method, body }) => {
-        const url = `http://localhost:5000/api/${endpoint}`;
+        const url = `${URL}/api/${endpoint}`;
+
         const headers = {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`,
         };
-
         try {
             const response = await fetch(url, {
                 method,

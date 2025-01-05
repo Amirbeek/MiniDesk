@@ -6,8 +6,11 @@ const cors = require("cors");
 const dashboard = require('./routes/dashboard');
 const auth2 = require('./auth2');
 const connectDB = require('./config/db');
-
+const helmet = require('helmet')
 const app = express();
+const compression = require('compression');
+const morgan = require('morgan');
+
 
 // Middleware
 app.use(cors({
@@ -16,6 +19,9 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization'],
 }));
 
+app.use(helmet())
+app.use(compression())
+app.use(morgan('combined'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -36,6 +42,8 @@ connectDB();
 app.use('/api/auth', authRoutes);
 app.use('/api', dashboard);
 app.use(auth2);
+
+
 
 // Start server
 const PORT = process.env.PORT || 5000;

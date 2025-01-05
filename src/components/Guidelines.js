@@ -13,7 +13,6 @@ import styled from "styled-components";
 import TabPanel2 from "./TabPanel2";
 import TabPanel3 from "./TabPanel3";
 
-// Styled Component for Tabs
 const TabStyle = styled(Tab)`
     box-sizing: border-box;
     &:hover {
@@ -52,7 +51,7 @@ export default function Guidelines() {
                 fullWidth
                 maxWidth="md"
                 PaperProps={{
-                    style: { maxHeight: "80vh", overflow: "hidden" },
+                    style: { height: "80vh", overflow: "hidden" },
                 }}
             >
                 {/* Dialog Header */}

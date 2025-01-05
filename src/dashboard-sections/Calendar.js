@@ -19,7 +19,7 @@ import {
     Resize,
 } from "@syncfusion/ej2-react-schedule";
 
-registerLicense('Ngo9BigBOggjHTQxAR8/V1NMaF5cXmBCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWH1dcXVVRWhZU0NzXkE=')
+registerLicense(process.env.REACT_APP_CLAIM_LICENSE_KEY);
 
 const ModalBackground = {
     position: "fixed",
@@ -65,7 +65,7 @@ const CloseButton = {
 const   MyCalendar = ({onChangeMode}) => {
     const [open, setOpen] = useState(false);
     const [EventData, setEventData] = useState([]);
-
+    const BACKEND_URL = process.env.REACT_APP_BACKEND_URL
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -74,8 +74,7 @@ const   MyCalendar = ({onChangeMode}) => {
                     window.location.href = '/login';
                     return;
                 }
-
-                const response = await axios.get('http://localhost:5000/api/dashboard', {
+                const response = await axios.get(`${BACKEND_URL}/api/dashboard`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
 
@@ -115,12 +114,11 @@ const   MyCalendar = ({onChangeMode}) => {
         },
     };
 
-    const API_URL = "http://localhost:5000/api/event";
+    const API_URL = `${BACKEND_URL}/api/event`;
 
     const addEvent = async (event) => {
         try {
             const token = localStorage.getItem("authToken");
-            console.log("dsgsdg, ",event)
             const response = await axios.post(
                 API_URL,
                 {
