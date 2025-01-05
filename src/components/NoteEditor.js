@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { Editor, EditorState, RichUtils } from "draft-js";
+import { Editor, RichUtils } from "draft-js";
 import styled from "styled-components";
 import DialogTitle from "./widget_component/DiaglogTitle";
 

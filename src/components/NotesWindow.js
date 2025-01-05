@@ -233,7 +233,7 @@ const NotesWindow = ({ open, setOpen, NoteData }, ref) => {
                                                                 selected={note._id === selectedNote?._id}
                                                                 onClick={() => handleSelectNote(note)}
                                                                 onContextMenu={(e) => {
-                                                                    handleContextMenu(e, note._id);
+                                                                    handleContextMenu(e);
                                                                     handleSelectNote(note);
                                                                 }}
                                                                 onDoubleClick={() => handleTitleDoubleClick(note)}
