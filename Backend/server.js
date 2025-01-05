@@ -1,12 +1,11 @@
 require('dotenv').config();
 const express = require('express');
-const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const authRoutes = require('./routes/auth');
 const cors = require("cors");
 const dashboard = require('./routes/dashboard');
 const auth2 = require('./auth2');
-require('./auth2');
+const connectDB = require('./config/db');
 
 const app = express();
 
@@ -30,28 +29,6 @@ app.use((error, req, res, next) => {
         data: data,
     });
 });
-
-// MongoDB connection
-const connectDB = async () => {
-    try {
-        await mongoose.connect(process.env.MONGO_URI, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        });
-        console.log('MongoDB connected');
-
-        if (process.env.CLEAR_DATABASE_ON_START === 'true') {
-            const collections = mongoose.connection.collections;
-            for (const key in collections) {
-                await collections[key].deleteMany({});
-            }
-            console.log('All collections cleared');
-        }
-    } catch (error) {
-        console.error('MongoDB connection error:', error.message);
-        process.exit(1);
-    }
-};
 
 connectDB();
 

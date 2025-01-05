@@ -6,7 +6,7 @@ const UserSchema = new mongoose.Schema(
     {
         googleId: {type:String},
         username: { type: String, unique: true, minlength: 3 },
-        email: { type: String, required: true, unique: true, lowercase: true, match: /.+\@.+\..+/ },
+        email: { type: String, required: true, unique: true, lowercase: true, match: /.+@.+\..+/ },
         name: { type: String, required: true },
         surname: { type: String, required: true },
         country: { type: String, default: null },
