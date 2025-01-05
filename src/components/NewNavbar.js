@@ -139,7 +139,7 @@ export default function MenuAppBar({ UserInfo ,setUserInfo}) {
                             onClick={handleMenu}
                             color="inherit"
                         >
-                            <div class={'hop'}>
+                            <div className={'hop'}>
                                 <SettingsOutlinedIcon />
                             </div>
                         </SettingButton>

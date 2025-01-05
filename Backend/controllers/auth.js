@@ -31,8 +31,6 @@ exports.postSignup = async (req, res) => {
         if (existingUser) {
             return res.status(400).json({ message: 'Username or email already taken' });
         }
-
-        // Create the user object
         const user = new User({
             username,
             email,
@@ -43,11 +41,8 @@ exports.postSignup = async (req, res) => {
             isActive: false,
         });
 
-        // Save the user to generate the _id
         await user.save();
         console.log("NEW USER _ID:", user._id);
-
-        // Create and save default Note
         const defaultNote = new Note({
             title: 'Your Note',
             content: [],
@@ -56,7 +51,6 @@ exports.postSignup = async (req, res) => {
         await defaultNote.save();
         user.notes.push(defaultNote);
 
-        // Create and save default Todo
         const defaultTodo = new Todos({
             title: 'Your Todo',
             creator: user._id,
@@ -153,15 +147,6 @@ exports.activateAccount = async (req, res) => {
         return res.status(500).json({ message: 'Something went wrong. Please try again later.' });
     }
 };
-
-exports.LogOut = async (req, res) => {
-    const { token } = req.params;
-    try{
-        const user = await User.findOne()
-    }catch(error){
-        console.error('Error during logOut:', error);
-    }
-}
 
 exports.getResitPasswordEmail = async (req, res) => {
     const email = req.body.email;

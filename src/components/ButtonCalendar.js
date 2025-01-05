@@ -92,13 +92,12 @@ const DateInfo = styled.p`
 
 const CalendarWidget = ({ date }) => {
     const today = dayjs();
-    const [currentMonth, setCurrentMonth] = useState(today);
     const currentDate = today.format('dddd, MMMM D, YYYY');
 
     const daysOfWeek = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
-    const firstDayOfMonth = currentMonth.startOf('month').day();
-    const daysInMonth = currentMonth.daysInMonth();
+    const firstDayOfMonth = today.startOf('month').day();
+    const daysInMonth = today.daysInMonth();
 
     const emptyDays = Array(firstDayOfMonth).fill(null);
     const daysArray = [...emptyDays, ...Array.from({ length: daysInMonth }, (_, index) => index + 1)];
@@ -107,7 +106,7 @@ const CalendarWidget = ({ date }) => {
         if (!date || !Array.isArray(date)) return 0;
         const eventsOnDay = date.filter(event => {
             const eventDate = dayjs(event.startTime);
-            return eventDate.isSame(currentMonth.date(day), 'day');
+            return eventDate.isSame(today.date(day), 'day');
         });
         return eventsOnDay.length;
     };
@@ -129,7 +128,6 @@ const CalendarWidget = ({ date }) => {
                             </WeekDays>
                             <div style={{ display: 'flex', flexWrap: 'wrap' }}>
                                 {daysArray.map((day, index) => (
-                                   <>
                                        <DayCell
                                            key={index}
                                            className={`
@@ -138,8 +136,6 @@ const CalendarWidget = ({ date }) => {
                                        >
                                            {day || ''}
                                        </DayCell>
-                                   </>
-
                                 ))}
                             </div>
                         </CalendarContent>
