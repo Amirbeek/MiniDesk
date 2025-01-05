@@ -13,7 +13,7 @@ import StyledListItem from "./widget_component/StyledListItem";
 import ListWrapper  from "./widget_component/ListWrapper";
 import AddNewListStyle from "./widget_component/AddNewListStyle";
 import {DragDropContext, Draggable, Droppable} from "react-beautiful-dnd";
-const TodosWindow = forwardRef(({ open, setOpen ,todosData}, ref) => {
+const TodosWindow =({ open, setOpen ,todosData}, ref) => {
     const [todos, setTodos] = useState(todosData);
     const [selectedTodo, setSelectedTodo] = useState(null);
     const [newTitle, setNewTitle] = useState("");
@@ -441,6 +441,6 @@ const TodosWindow = forwardRef(({ open, setOpen ,todosData}, ref) => {
             </DialogContent>
         </Dialog>
     );
-});
+};
 
 export default TodosWindow;

@@ -20,7 +20,7 @@ import StyledListItem from "./widget_component/StyledListItem";
 import ListWrapper  from "./widget_component/ListWrapper";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
-const NotesWindow = forwardRef(({ open, setOpen, NoteData }, ref) => {
+const NotesWindow = ({ open, setOpen, NoteData }, ref) => {
     const [notes, setNotes] = useState(NoteData);
     const [selectedNote, setSelectedNote] = useState(null);
     const [editorState, setEditorState] = useState(EditorState.createEmpty());
@@ -305,6 +305,6 @@ const NotesWindow = forwardRef(({ open, setOpen, NoteData }, ref) => {
             {isLoading && <CircularProgress style={{ position: 'absolute', top: '50%', left: '50%' }} />}
         </Dialog>
     );
-});
+};
 
 export default NotesWindow;
