@@ -13,7 +13,6 @@ import "../index.css";
 import BookMark from "./BookMark";
 import AddBookmarkDialog from "./bookmark_component/AddBookmarkDialog";
 
-
 const HorizontalScrollBox = ({marks}) => {
     const [mark, setMark] = useState(marks);
     const [dialogOpen, setDialogOpen] = useState(false);
@@ -75,9 +74,6 @@ const HorizontalScrollBox = ({marks}) => {
         [apiCall, selectedMark, resetSelection]
     );
 
-
-
-
     const handleOpenDialog = useCallback(() => {
         setDialogOpen(true);
         setEditMode(false);
@@ -89,14 +85,21 @@ const HorizontalScrollBox = ({marks}) => {
         setNewTitle(mark.title);
     }, []);
 
-    const handleTitleSave = useCallback(() => {
+    const handleTitleSave = useCallback(async () => {
         if (selectedMark && newTitle.trim() !== "") {
             setMark((prevMarks) =>
                 prevMarks.map((item) =>
-                    item._id === selectedMark._id ? { ...item, title: newTitle } : item
+                    item._id === selectedMark._id ? {...item, title: newTitle} : item
                 )
             );
+            await apiCall({
+                endpoint: `mark/${selectedMark._id}`,
+                method: 'PUT',
+                body: {title: newTitle},
+            });
         }
+
+
         resetSelection();
     }, [selectedMark, newTitle, resetSelection]);
 
@@ -105,19 +108,22 @@ const HorizontalScrollBox = ({marks}) => {
         if (editMode) setEditMode(false);
     }, [editMode, setEditMode]);
 
-    const onDragEnd = useCallback(
-        (result) => {
-            if (!result.destination) return;
-            const items = Array.from(mark);
-            const [reorderedItem] = items.splice(result.source.index, 1);
-            items.splice(result.destination.index, 0, reorderedItem);
-            setMark(items);
-        },
-        [mark]
-    );
-    const onDragEndItems = (result) => {
-        console.log(result)
-        const { source, destination } = result;
+    const onDragEnd = useCallback(async (result) => {
+        if (!result.destination) return;
+        const items = Array.from(mark);
+        const [reorderedItem] = items.splice(result.source.index, 1);
+        items.splice(result.destination.index, 0, reorderedItem);
+        setMark(items);
+        const orderedIds = items.map(item => item._id);
+        await apiCall({
+            endpoint: 'mark/reorder',
+            method: 'PUT',
+            body: { orderedMarks: orderedIds },
+        });
+    }, [mark]);
+
+    const onDragEndItems = async (result) => {
+        const {source, destination} = result;
         if (!destination) return;
         const reorderedMarks = Array.from(selectedMark.marks);
         const [movedItem] = reorderedMarks.splice(source.index, 1);
@@ -133,8 +139,12 @@ const HorizontalScrollBox = ({marks}) => {
             ...prevSelected,
             marks: reorderedMarks
         }));
+        await apiCall({
+            endpoint: `mark/reorder/${selectedMark._id}`,
+            method: 'PUT',
+            body: {marks: reorderedMarks},
+        });
     };
-
 
     const handleAddBookmark = async ({ title, url, parentBookmarkTitle }) => {
         try {

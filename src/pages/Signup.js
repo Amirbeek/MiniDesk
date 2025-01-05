@@ -12,7 +12,7 @@ const SignupForm = () => {
     const navigate = useNavigate();
     const apiCall = useApi();
 
-    const countries = ['USA', 'Canada', 'UK', 'Australia', 'Germany', 'France'];
+    const countries = ['USA', 'Canada', 'UK', 'Australia', 'Germany', 'France','UZB'];
 
     const validationSchema = Yup.object().shape({
         username: Yup.string().required('Username is required').min(3, 'Must be at least 3 characters'),

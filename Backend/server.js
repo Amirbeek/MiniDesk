@@ -40,7 +40,6 @@ const connectDB = async () => {
         });
         console.log('MongoDB connected');
 
-        // Clear database on start
         if (process.env.CLEAR_DATABASE_ON_START === 'true') {
             const collections = mongoose.connection.collections;
             for (const key in collections) {

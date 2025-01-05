@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 const ListContainer = styled.div`
-    width: 30%;
+    width: 250px;
     height: 60vh;
     overflow-y: auto;        
     padding-right: 10px;     

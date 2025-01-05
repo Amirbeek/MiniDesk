@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { Dialog, DialogContent, DialogActions, DialogTitle, Button, TextField, Select, MenuItem, Typography, FormControl, InputLabel } from '@mui/material';
+import { Dialog, DialogContent, DialogActions, Button, TextField, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import { EditHomePageContext } from "../EditHomePage";
 import DialogHeader from "../widget_component/DialogHeader";
 
@@ -48,7 +48,6 @@ const AddBookmarkDialog = ({ open, setDialogOpen, handleAddBookmark, bookmarks, 
     return (
         <Dialog open={open} onClose={() => { setDialogOpen(false); setEditMode(false); }} fullWidth maxWidth="sm">
             <DialogHeader onClose={handleCancel} title={'Add New Bookmark'}/>
-
             <DialogContent>
                 <FormControl fullWidth margin="normal">
                     <TextField

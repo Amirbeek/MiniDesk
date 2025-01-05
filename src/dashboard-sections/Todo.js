@@ -52,7 +52,7 @@ function Todo({ todosData,onChangeMode }) {
                    }
                 })
             }
-            {count <= 4 && <span style={{marginLeft: 10}}>More...</span>}
+            {count >= 4 && <span style={{marginLeft: 10}}>More...</span>}
         </div>
     );
 

@@ -3,7 +3,6 @@ import debounce from "lodash.debounce";
 import {
     Dialog,
     DialogContent,
-    Divider,
     TextField,
     CircularProgress,
 } from "@mui/material";
@@ -19,6 +18,7 @@ import ContextMenu from "./widget_component/ContextMenu";
 import useApi from "../useApi";
 import StyledListItem from "./widget_component/StyledListItem";
 import ListWrapper  from "./widget_component/ListWrapper";
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 const NotesWindow = forwardRef(({ open, setOpen, NoteData }, ref) => {
     const [notes, setNotes] = useState(NoteData);
@@ -55,7 +55,6 @@ const NotesWindow = forwardRef(({ open, setOpen, NoteData }, ref) => {
             console.error('Error saving note:', error);
         }
     }, 500);
-
     const handleClose = () => setOpen(false);
     const handleAddNote = async () => {
         setIsLoading(true);
@@ -165,6 +164,7 @@ const NotesWindow = forwardRef(({ open, setOpen, NoteData }, ref) => {
                 const updatedNotes = notes.map((note) =>
                     note._id === selectedNote._id ? { ...note, title: newTitle } : note
                 );
+                setSelectedNote(updatedNote)
                 setNotes(updatedNotes);
                 setEditingTitle(false);
             } catch (error) {
@@ -175,69 +175,118 @@ const NotesWindow = forwardRef(({ open, setOpen, NoteData }, ref) => {
         }
     };
 
+    const onDragEnd = result => {
+        const { destination, source } = result;
+        if (!destination || destination.index === source.index) {
+            return;
+        }
+
+        const newNotes = Array.from(notes);
+        const [removed] = newNotes.splice(source.index, 1);
+        newNotes.splice(destination.index, 0, removed);
+
+        setNotes(newNotes);
+
+        const orderedIds = newNotes.map(note => note._id);
+        const updateNotesOrderOnServer = async (orderedIds) => {
+            try {
+                console.log(orderedIds)
+                const response = await apiCall({
+                    endpoint: 'notes/reorder',
+                    method: 'PUT',
+                    body: {orderedNoteIds:orderedIds} ,
+                });
+                if (!response.success) {
+                    console.error('Error reordering notes:', response.message);
+                }
+            } catch (error) {
+                console.error('Error sending reordered notes to server:', error);
+            }
+        };
+        updateNotesOrderOnServer(orderedIds)
+    };
+
+
 
     return (
         <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">
             <DialogHeader title="Note Widget" onClose={handleClose} />
             <DialogContent>
-                < div style={{display: "flex"}}>
-                        <DialogListContainer >
-                            {notes.map((note) => (
-                                <ListWrapper>
-                                    <StyledListItem
-                                        key={note._id}
-                                        button
-                                        selected={note._id === selectedNote?._id}
-                                        onClick={() => handleSelectNote(note)}
-                                        onContextMenu={(e) => {
-                                            handleContextMenu(e, note._id);
-                                            handleSelectNote(note);
-                                        }}
-                                        onDoubleClick={() => handleTitleDoubleClick(note)}
-                                        sx={{
-                                            backgroundColor: note._id === selectedNote?._id ? 'rgba(0, 0, 0, 0.08)' : 'transparent',
-                                            color: note._id === selectedNote?._id ? '#000' : 'inherit',
-                                        }}
-                                    >
-                                        {editingTitle && selectedNote._id === note._id ? (
-                                                <TextField
-                                                    variant="standard"
-                                                    type="text"
-                                                    value={newTitle}
-                                                    onChange={handleTitleChange}
-                                                    onBlur={handleTitleSave}
-                                                    onKeyDown={(e) => {
-                                                        if (e.key === "Enter") handleTitleSave();
-                                                    }}
-                                                    autoFocus
-                                                    fullWidth
-                                                />
-                                        ) : (
-                                            note.title
-                                        )}
-                                    </StyledListItem>
-                                </ListWrapper>
-                            ))}
-                            <Divider />
-                        </DialogListContainer>
-                        <AddNew onClick={handleAddNote} >
-                            Add New Note
-                        </AddNew>
-                    <DialogDetailsContainer >
+                <div style={{ display: "flex" }}>
+                    <DragDropContext onDragEnd={onDragEnd}>
+                        <Droppable droppableId="notes">
+                            {(provided) => (
+                                <div ref={provided.innerRef} {...provided.droppableProps}>
+                                    <DialogListContainer>
+                                        {notes.map((note, index) => (
+                                            <Draggable key={note._id} draggableId={note._id} index={index}>
+                                                {(provided) => (
+                                                    <div
+                                                        ref={provided.innerRef}
+                                                        {...provided.draggableProps}
+                                                        {...provided.dragHandleProps}
+                                                    >
+                                                        <ListWrapper>
+                                                            <StyledListItem
+                                                                key={note._id}
+                                                                button
+                                                                selected={note._id === selectedNote?._id}
+                                                                onClick={() => handleSelectNote(note)}
+                                                                onContextMenu={(e) => {
+                                                                    handleContextMenu(e, note._id);
+                                                                    handleSelectNote(note);
+                                                                }}
+                                                                onDoubleClick={() => handleTitleDoubleClick(note)}
+                                                                sx={{
+                                                                    backgroundColor: note._id === selectedNote?._id ? 'rgba(0, 0, 0, 0.08)' : 'transparent',
+                                                                    color: note._id === selectedNote?._id ? '#000' : 'inherit',
+                                                                }}
+                                                            >
+                                                                {editingTitle && selectedNote._id === note._id ? (
+                                                                    <TextField
+                                                                        variant="standard"
+                                                                        type="text"
+                                                                        value={newTitle}
+                                                                        onChange={handleTitleChange}
+                                                                        onBlur={handleTitleSave}
+                                                                        onKeyDown={(e) => {
+                                                                            if (e.key === "Enter") handleTitleSave();
+                                                                        }}
+                                                                        autoFocus
+                                                                        fullWidth
+                                                                    />
+                                                                ) : (
+                                                                    note.title
+                                                                )}
+                                                            </StyledListItem>
+                                                        </ListWrapper>
+                                                    </div>
+                                                )}
+                                            </Draggable>
+                                        ))}
+                                        {provided.placeholder}
+                                    </DialogListContainer>
+                                </div>
+                            )}
+                        </Droppable>
+                    </DragDropContext>
+                    <AddNew onClick={handleAddNote} >
+                        Add New Note
+                    </AddNew>
+                    <DialogDetailsContainer>
                         {selectedNote ? (
-                                <RichEditor
-                                    title={selectedNote.title}
-                                    editorState={editorState}
-                                    setEditorState={(newEditorState) => {
-                                        setEditorState(newEditorState);
-                                        debouncedSaveNote(newEditorState);
-                                    }}
-                                />
+                            <RichEditor
+                                title={selectedNote.title}
+                                editorState={editorState}
+                                setEditorState={(newEditorState) => {
+                                    setEditorState(newEditorState);
+                                    debouncedSaveNote(newEditorState);
+                                }}
+                            />
                         ) : (
                             <UnSelected>Select a note to edit</UnSelected>
                         )}
                     </DialogDetailsContainer>
-                <div/>
                 </div>
                 <ContextMenu
                     mousePos={mousePos}
@@ -252,9 +301,7 @@ const NotesWindow = forwardRef(({ open, setOpen, NoteData }, ref) => {
                         },
                     ]}
                 />
-
             </DialogContent>
-
             {isLoading && <CircularProgress style={{ position: 'absolute', top: '50%', left: '50%' }} />}
         </Dialog>
     );

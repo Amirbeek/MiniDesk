@@ -38,10 +38,7 @@ const StyleButton = styled.button`
         
     }
 `;
-const EditorControllers = styled.div`
-    //position: absolute;
 
-`
 const RichEditor = ({ editorState, setEditorState ,title}) => {
     const editorRef = useRef(null);
 
@@ -74,7 +71,6 @@ const RichEditor = ({ editorState, setEditorState ,title}) => {
 
     return (
         <EditorWrapper>
-            <EditorControllers>
                 <DialogTitle>{title}</DialogTitle>
                 <EditorControls>
                     {["H1", "H2", "H3", "Blockquote", "UL", "OL", "code-block"].map((blockType) => (
@@ -103,7 +99,6 @@ const RichEditor = ({ editorState, setEditorState ,title}) => {
                         </StyleButton>
                     ))}
                 </EditorControls>
-            </EditorControllers>
             <ContentEditor onClick={focus} >
                 <Editor
                     ref={editorRef}

@@ -12,6 +12,7 @@ import ContextMenu from "./widget_component/ContextMenu";
 import StyledListItem from "./widget_component/StyledListItem";
 import ListWrapper  from "./widget_component/ListWrapper";
 import AddNewListStyle from "./widget_component/AddNewListStyle";
+import {DragDropContext, Draggable, Droppable} from "react-beautiful-dnd";
 const TodosWindow = forwardRef(({ open, setOpen ,todosData}, ref) => {
     const [todos, setTodos] = useState(todosData);
     const [selectedTodo, setSelectedTodo] = useState(null);
@@ -79,11 +80,11 @@ const TodosWindow = forwardRef(({ open, setOpen ,todosData}, ref) => {
         }
     };
     const handleRightClick = (event, todo, task = null) => {
-            event.preventDefault();
-            setSelectedTodo(todo);
-            setSelectedTask(task);
-            setMousePos({mouseX: event.clientX - 2, mouseY: event.clientY - 4});
-        };
+        event.preventDefault();
+        setSelectedTodo(todo);
+        setSelectedTask(task);
+        setMousePos({mouseX: event.clientX - 2, mouseY: event.clientY - 4});
+    };
     const handleTitleChange = (e) => setNewTitle(e.target.value);
     const handleTitleSave = async () => {
         if (newTitle.trim() && selectedTodo) {
@@ -230,127 +231,216 @@ const TodosWindow = forwardRef(({ open, setOpen ,todosData}, ref) => {
         }
     };
 
+    const onDragEnd = result => {
+        const { destination, source } = result;
+        if (!destination || destination.index === source.index) {
+            return;
+        }
+
+        const newTodos = Array.from(todos);
+        const [removed] = newTodos.splice(source.index, 1);
+        newTodos.splice(destination.index, 0, removed);
+
+        setTodos(newTodos);
+
+        const orderedIds = newTodos.map(note => note._id);
+        const updateTodosOrderOnServer = async (orderedIds) => {
+            try {
+                console.log(orderedIds)
+                const response = await apiCall({
+                    endpoint: 'todo/reorder',
+                    method: 'PUT',
+                    body: {orderedTodosIds:orderedIds} ,
+                });
+                if (!response.success) {
+                    console.error('Error reordering notes:', response.message);
+                }
+            } catch (error) {
+                console.error('Error sending reordered notes to server:', error);
+            }
+        };
+        updateTodosOrderOnServer(orderedIds)
+    };
+
+    const onDragItemEnd = async (result) => {
+        const {destination, source} = result;
+
+        if (!destination) return;
+
+        if (destination.index === source.index) return;
+
+        const updatedTodos = [...selectedTodo.todos];
+        const [removed] = updatedTodos.splice(source.index, 1);
+        updatedTodos.splice(destination.index, 0, removed);
+
+
+
+        setSelectedTodo({...selectedTodo, todos: updatedTodos});
+        console.log(updatedTodos)
+        await apiCall({
+            endpoint: `todo/reorder/${selectedTodo._id}`,
+            method: 'PUT',
+            body: {tasks :updatedTodos},
+        });
+
+    };
 
     return (
-            <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">
-                <DialogHeader title="Todos Widget" onClose={handleClose}/>
-                <DialogContent>
-                    <div style={{display: "flex"}}>
-                        <DialogListContainer>
-                            {todos.map((todo) => (
-                                <ListWrapper key={todo._id}>
-                                    <StyledListItem
-                                        button
-                                        selected={todo._id === selectedTodo?._id}
-                                        onClick={() => setSelectedTodo(todo)}
-                                        onDoubleClick={() => {
-                                            setEditingTitle(true);
-                                            setNewTitle(todo.title);
-                                        }}
-                                        sx={{
-                                            backgroundColor: todo._id === selectedTodo?._id ? 'rgba(0, 0, 0, 0.08)' : 'transparent',
-                                            color: todo._id === selectedTodo?._id ? '#000' : 'inherit',
-                                        }}
-                                        onContextMenu={(e) => handleRightClick(e, todo)}
-                                    >
-                                        {editingTitle && selectedTodo?._id === todo._id ? (
-                                            <TextField
-                                                variant="standard"
-                                                value={newTitle}
-                                                onChange={handleTitleChange}
-                                                onBlur={handleTitleSave}
-                                                onKeyDown={(e) => {
-                                                    if (e.key === "Enter") handleTitleSave();
-                                                }}
-                                                autoFocus
-                                                fullWidth
-                                                required
-                                            />
-                                        ) : (
-                                            todo.title
-                                        )}
-                                    </StyledListItem>
-                                </ListWrapper>
-                            ))}
-                            <Divider/>
-
-                        </DialogListContainer>
-                        <AddNew
-                            onClick={handleAddTodo}
-                        > Add new Task
-                        </AddNew>
-                        <DialogDetailsContainer>
-                            {selectedTodo ? (
-                                <div>
-                                    <DialogTitle>{selectedTodo.title}</DialogTitle>
-                                    <List>
-                                        {selectedTodo.todos.map((task) => (
-                                            <ListItem
-                                                key={task._id}
-                                                onContextMenu={(e) => handleRightClick(e, selectedTodo, task)}
-
-                                            >
-                                                <Checkbox
-                                                    checked={task.done}
-                                                    onChange={() => handleToggleTask(task._id)}
-                                                />
-                                                {editingTaskId === task._id ? (
-                                                    <TextField
-                                                        variant="standard"
-                                                        value={newTaskName}
-                                                        onChange={handleTaskNameChange}
-                                                        onBlur={handleTaskSave}
-                                                        onKeyDown={(e) => {
-                                                            if (e.key === "Enter") handleTaskSave();
-                                                        }}
-                                                        autoFocus
-                                                    />
-                                                ) : (
-                                                    <span onDoubleClick={() => handleEditTask(task)}>
-                                                {task.text}
-                                            </span>
+        <Dialog open={open} onClose={handleClose} fullWidth maxWidth="md">
+            <DialogHeader title="Todos Widget" onClose={handleClose}/>
+            <DialogContent>
+                <div style={{display: "flex"}}>
+                    <DragDropContext onDragEnd={onDragEnd}>
+                        <Droppable droppableId="todos">
+                            {(provided) => (
+                                <div ref={provided.innerRef} {...provided.droppableProps}>
+                                    <DialogListContainer>
+                                        {todos.map((todo, index) => (
+                                            <Draggable key={todo._id} draggableId={todo._id} index={index}>
+                                                {(provided) => (
+                                                    <div
+                                                        ref={provided.innerRef}
+                                                        {...provided.draggableProps}
+                                                        {...provided.dragHandleProps}
+                                                    >
+                                                        <ListWrapper key={todo._id}>
+                                                            <StyledListItem
+                                                                button
+                                                                selected={todo._id === selectedTodo?._id}
+                                                                onClick={() => setSelectedTodo(todo)}
+                                                                onDoubleClick={() => {
+                                                                    setEditingTitle(true);
+                                                                    setNewTitle(todo.title);
+                                                                }}
+                                                                sx={{
+                                                                    backgroundColor: todo._id === selectedTodo?._id ? 'rgba(0, 0, 0, 0.08)' : 'transparent',
+                                                                    color: todo._id === selectedTodo?._id ? '#000' : 'inherit',
+                                                                }}
+                                                                onContextMenu={(e) => handleRightClick(e, todo)}
+                                                            >
+                                                                {editingTitle && selectedTodo?._id === todo._id ? (
+                                                                    <TextField
+                                                                        variant="standard"
+                                                                        value={newTitle}
+                                                                        onChange={handleTitleChange}
+                                                                        onBlur={handleTitleSave}
+                                                                        onKeyDown={(e) => {
+                                                                            if (e.key === "Enter") handleTitleSave();
+                                                                        }}
+                                                                        autoFocus
+                                                                        fullWidth
+                                                                        required
+                                                                    />
+                                                                ) : (
+                                                                    todo.title
+                                                                )}
+                                                            </StyledListItem>
+                                                        </ListWrapper>
+                                                    </div>
                                                 )}
-                                            </ListItem>
+                                            </Draggable>
                                         ))}
-                                    </List>
-                                    <AddNewListStyle
-                                        onClick={handleAddTask}
-                                        itemCount={selectedTodo.todos.length}
-                                    >
-                                        {selectedTodo.todos.length === 0}
-                                    </AddNewListStyle>
+                                        <Divider/>
+
+                                    </DialogListContainer>
                                 </div>
-                            ) : (
-                                <UnSelected>Select a todo to view details</UnSelected>
                             )}
-                        </DialogDetailsContainer>
-                    </div>
-                    <ContextMenu
-                        mousePos={mousePos}
-                        onClose={() => setMousePos({mouseX: null, mouseY: null})}
-                        menuItems={
-                            selectedTask
+                        </Droppable>
+                    </DragDropContext>
+                    <AddNew onClick={handleAddTodo}>
+                        Add new Task
+                    </AddNew>
+
+                    <DialogDetailsContainer>
+                        {selectedTodo ? (
+                            <div>
+                                <DialogTitle>{selectedTodo.title}</DialogTitle>
+                                <DragDropContext onDragEnd={onDragItemEnd}>
+                                    <Droppable droppableId="task">
+                                        {(provided) => (
+                                            <div ref={provided.innerRef} {...provided.droppableProps}>
+                                                     <List>
+                                                         {selectedTodo.todos.map((task,index) => (
+                                                             <Draggable key={task._id} draggableId={task._id} index={index}>
+                                                                 {(provided) => (
+                                                                     <div
+                                                                         ref={provided.innerRef}
+                                                                         {...provided.draggableProps}
+                                                                         {...provided.dragHandleProps}
+                                                                     >
+                                                                            <ListItem
+                                                                                key={task._id}
+                                                                                onContextMenu={(e) => handleRightClick(e, selectedTodo, task)}
+
+                                                                            >
+                                                                                <Checkbox
+                                                                                    checked={task.done}
+                                                                                    onChange={() => handleToggleTask(task._id)}
+                                                                                />
+                                                                                {editingTaskId === task._id ? (
+                                                                                    <TextField
+                                                                                        variant="standard"
+                                                                                        value={newTaskName}
+                                                                                        onChange={handleTaskNameChange}
+                                                                                        onBlur={handleTaskSave}
+                                                                                        onKeyDown={(e) => {
+                                                                                            if (e.key === "Enter") handleTaskSave();
+                                                                                        }}
+                                                                                        autoFocus
+                                                                                    />
+                                                                                ) : (
+                                                                                    <span onDoubleClick={() => handleEditTask(task)}>
+                                                                                    {task.text}
+                                                                                </span>
+                                                                                )}
+                                                                            </ListItem>
+                                                                     </div>
+                                                                 )}
+                                                             </Draggable>
+                                                             ))}
+                                                     </List>
+                                            </div>
+                                        )}
+                                    </Droppable>
+                                </DragDropContext>
+                                <AddNewListStyle
+                                    onClick={handleAddTask}
+                                    itemCount={selectedTodo.todos.length}
+                                >
+                                    {selectedTodo.todos.length === 0}
+                                </AddNewListStyle>
+                            </div>
+                        ) : (
+                            <UnSelected>Select a todo to view details</UnSelected>
+                        )}
+                    </DialogDetailsContainer>
+                </div>
+                <ContextMenu
+                    mousePos={mousePos}
+                    onClose={() => setMousePos({mouseX: null, mouseY: null})}
+                    menuItems={
+                        selectedTask
+                            ? [
+                                {
+                                    label: "Delete Task",
+                                    onClick: handleDeleteTask,
+                                    icon: <Trash/>,
+                                },
+                            ]
+                            : selectedTodo
                                 ? [
                                     {
-                                        label: "Delete Task",
-                                        onClick: handleDeleteTask,
-                                        icon: <Trash/>,
+                                        label: "Delete Todo",
+                                        onClick: handleDeleteTodo,
+                                        icon: <XCircle/>,
                                     },
                                 ]
-                                : selectedTodo
-                                    ? [
-                                        {
-                                            label: "Delete Todo",
-                                            onClick: handleDeleteTodo,
-                                            icon: <XCircle/>,
-                                        },
-                                    ]
-                                    : []
-                        }
-                    />
-                </DialogContent>
-            </Dialog>
-        );
-    });
+                                : []
+                    }
+                />
+            </DialogContent>
+        </Dialog>
+    );
+});
 
 export default TodosWindow;

@@ -11,7 +11,7 @@ const DetailsContainer = styled.div`
     position: relative;
     &::-webkit-scrollbar {
         width: 3px;
-        height: 0px;
+        height: 0;
     }
 
     &::-webkit-scrollbar-thumb {

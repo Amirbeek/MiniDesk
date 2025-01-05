@@ -3,10 +3,11 @@ const Event = require('../models/Event');
 const Note = require("../models/Notes");
 const Todo = require('../models/Todos')
 const Mark = require('../models/Marks')
-
+const mongoose = require('mongoose');
 exports.getUserInfo = async (req, res) => {
     try {
         const userId = req.user.userId;
+        console.log('USER ID: ' , userId);
         const user = await User.findById(userId)
             .populate('events')
             .populate('todos')
@@ -30,7 +31,8 @@ exports.getUserInfo = async (req, res) => {
                 notes: user.notes,
                 todos: user.todos,
                 marks: user.marks,
-                backgroundImage:user.backgroundImage
+                backgroundImage:user.backgroundImage,
+                unicorn: user.unicorn
             },
         });
     } catch (err) {
@@ -38,7 +40,6 @@ exports.getUserInfo = async (req, res) => {
         res.status(500).json({ message: 'Error fetching dashboard data', error: err.message });
     }
 };
-
 exports.PutBackgroundImage = async (req, res) => {
     try {
         const userId = req.user.userId;
@@ -67,9 +68,37 @@ exports.PutBackgroundImage = async (req, res) => {
         });
     }
 };
+exports.PutAccountSettings = async (req, res) => {
+    try {
+        const userId = req.user.userId;
+        const { unicorn, country } = req.body;
 
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        user.unicorn = unicorn;
+
+        if (country !== undefined && country !== null) {
+            user.country = country;
+        }
+
+        await user.save();
+
+        res.status(200).json({
+            message: 'Successfully updated unicorn and country!',
+        });
+    } catch (err) {
+        console.error('Error updating unicorn and country:', err);
+        res.status(500).json({
+            message: 'Failed to update unicorn and country!',
+            error: err.message,
+        });
+    }
+};
 exports.postEvent = async (req, res) => {
-    const userId = req.user.userId; // Assuming `userId` is available from authentication middleware
+    const userId = req.user.userId;
     const { subject, location, description, startTime, endTime, isAllDay, repeat, customRepeatInterval, timezone } = req.body;
 
     const event = new Event({
@@ -113,17 +142,13 @@ exports.UpdateEvent = async (req, res) => {
             return res.status(404).json({ message: 'Event not found' });
         }
 
-        // Check if the user is the creator
         if (event.creator.toString() !== userId) {
             return res.status(403).json({ message: 'Not authorized!' });
         }
-
-        // Validate input
         if (!subject || !location || !startTime || !endTime) {
             return res.status(400).json({ message: 'Missing required fields' });
         }
 
-        // Update event details
         event.subject = subject;
         event.location = location;
         event.startTime = new Date(startTime);
@@ -205,10 +230,6 @@ exports.PutNote = async function (req, res) {
         const userId = req.user.userId;
         const noteId = req.params.noteId;
         let { title, content } = req.body;
-
-        console.log("Post Note UserID: " + userId);
-        console.log("data of Note: ",noteId);
-        console.log('DATA NOTE: ', title, content)
         const note = await Note.findById(noteId);
 
         if (!note) {
@@ -227,6 +248,26 @@ exports.PutNote = async function (req, res) {
         res.status(500).json({ message: 'Error updating Note', error: e.message });
     }
 };
+exports.NoteReorder = async function (req, res) {
+    try {
+        const userId = req.user.userId;
+        const { orderedNoteIds } = req.body;
+
+        const areValidIds = orderedNoteIds.every(id => mongoose.Types.ObjectId.isValid(id));
+
+        if (!areValidIds) {
+            return res.status(400).json({ message: 'Invalid note ID(s) provided.' });
+        }
+
+        await User.findByIdAndUpdate(userId, {
+            $set: { notes: orderedNoteIds }
+        });
+
+        res.json({ message: 'Notes reordered successfully.' });
+    } catch (e) {
+        res.status(500).json({ message: 'Error updating Order Note', error: e.message });
+    }
+}
 exports.DeleteNote = async function (req, res) {
     try {
         const userId = req.user.userId;
@@ -318,6 +359,53 @@ exports.PutTodo = async function (req, res) {
         res.status(500).json({ message: 'Error updating todo', error: err.message });
     }
 };
+exports.TodoOrder = async function (req, res) {
+    try {
+        const userId = req.user.userId;
+        const { orderedTodosIds } = req.body;
+
+        const areValidIds = orderedTodosIds.every(id => mongoose.Types.ObjectId.isValid(id));
+
+        if (!areValidIds) {
+            return res.status(400).json({ message: 'Invalid todos ID(s) provided.' });
+        }
+
+        await User.findByIdAndUpdate(userId, {
+            $set: { todos: orderedTodosIds }
+        });
+
+        res.json({ message: 'todos reordered successfully.' });
+    } catch (e) {
+        res.status(500).json({ message: 'Error updating Order todos', error: e.message });
+    }
+}
+exports.TodoItemReOrder = async function(req, res) {
+    try {
+        const userId = req.user.userId;
+        const todoId = req.params.todoId;
+        const { tasks } = req.body;
+
+        // Find the specific todo by userId and todoId
+        const todo = await Todo.findOne({ _id: todoId, creator: userId });
+        if (!todo) {
+            return res.status(404).json({ message: 'Todo not found.' });
+        }
+
+        const reorderedTodos = tasks.map(task => {
+            return todo.todos.find(todoTask => todoTask._id.toString() === task._id.toString());
+        });
+
+        // Ensure that the reordered tasks are updated
+        todo.todos = reorderedTodos;
+
+        // Save the updated todo
+        await todo.save();
+
+        res.json({ message: 'Tasks reordered successfully.', todo: todo.todos });
+    } catch (e) {
+        res.status(500).json({ message: 'Error updating task order', error: e.message });
+    }
+};
 exports.DeleteTodo = async function (req, res) {
     try {
         const userId = req.user.userId;
@@ -342,8 +430,6 @@ exports.DeleteTodo = async function (req, res) {
         res.status(500).json({ message: 'Error deleting todo', error: err.message });
     }
 };
-
-
 exports.PostMark = async function (req, res) {
     try {
         const userId = req.user.userId;
@@ -375,8 +461,6 @@ exports.PostMark = async function (req, res) {
         res.status(500).json({ message: "Error creating mark", error: err.message });
     }
 };
-const mongoose = require('mongoose');
-
 exports.PutMark = async function (req, res) {
     const userId = req.user.userId;
     const markId = req.params.markId;
@@ -410,6 +494,53 @@ exports.PutMark = async function (req, res) {
         res.status(500).json({ message: 'Error updating mark', error: err.message });
     }
 };
+exports.MarkOrder = async function (req, res) {
+    try {
+        const userId = req.user.userId;
+        const { orderedMarks } = req.body;
+
+        const areValidIds = orderedMarks.every(id => mongoose.Types.ObjectId.isValid(id));
+
+        if (!areValidIds) {
+            return res.status(400).json({ message: 'Invalid Marks ID(s) provided.' });
+        }
+
+        await User.findByIdAndUpdate(userId, {
+            $set: { marks: orderedMarks }
+        });
+
+        res.json({ message: 'Marks reordered successfully.' });
+    } catch (e) {
+        res.status(500).json({ message: 'Error updating Order Marks', error: e.message });
+    }
+};
+
+exports.MarkItemReOrder = async function(req, res) {
+    try {
+        const userId = req.user.userId;
+        const markId = req.params.markId;
+        const { marks } = req.body;
+
+        const mark = await Mark.findOne({ _id: markId, creator: userId });
+        if (!mark) {
+            return res.status(404).json({ message: 'Mark not found.' });
+        }
+
+        const reorderedMarks = marks.map(markItem => {
+            return mark.marks.find(existingMark => existingMark._id.toString() === markItem._id.toString());
+        });
+
+        mark.marks = reorderedMarks;
+
+        await mark.save();
+
+        res.json({ message: 'Mark reordered successfully.', marks: mark.marks });
+    } catch (e) {
+        res.status(500).json({ message: 'Error updating Mark order', error: e.message });
+    }
+};
+
+
 
 exports.DeleteMark = async function (req, res) {
     try {
