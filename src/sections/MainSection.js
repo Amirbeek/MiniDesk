@@ -53,8 +53,11 @@ const navigateToUrl = (url) => {
 };
 
 const auth = async () => {
+    const URL = process.env.REACT_APP_BACKEND_URL;  // Correctly accessing the backend URL
+    console.log(URL);
+
     try {
-        const response = await fetch('http://localhost:5000/request', { method: 'GET' });
+        const response = await fetch(`${URL}/request`, { method: 'GET' });
         const data = await response.json();
 
         if (data.url) {
@@ -66,6 +69,7 @@ const auth = async () => {
         console.error('Error during authentication:', error);
     }
 };
+
 
 const About = () => {
     const [currentText, setCurrentText] = useState('design');
