@@ -6,16 +6,16 @@ export default function TabPanel1() {
     const [tooltipVisible, setTooltipVisible] = useState(false);
 
     const handleCopy = () => {
-        const linkToCopy = "https://www.tinydesk.me";
+        const linkToCopy = "https://www.minidesk.me";
         navigator.clipboard.writeText(linkToCopy);
         setTooltipVisible(true);
-        setTimeout(() => setTooltipVisible(false), 1500); // Hide tooltip after 1.5 seconds
+        setTimeout(() => setTooltipVisible(false), 1500);
     };
 
     return (
         <>
             <Typography variant="h6"  sx={{
-                textTransform: "uppercase", // Transform text to uppercase
+                textTransform: "uppercase",
             }} gutterBottom>
                 How to set Tiny Desk as Homepage for Chrome
             </Typography>
@@ -48,7 +48,7 @@ export default function TabPanel1() {
             <Box display="flex" alignItems="center" justifyContent={'left'} gap={1} mt={2}>
                 <div style={{display: 'flex', }}>
                     <Typography variant="subtitle1" sx={{ flexGrow: 1 ,marginTop:1.5}}>
-                        https://www.tinydesk.me
+                        https://www.minidesk.me
                     </Typography>
                     <button
                         onClick={handleCopy}

@@ -8,7 +8,7 @@ export default function TabPanel2() {
     const [tooltipVisible, setTooltipVisible] = useState(false);
 
     const handleCopy = () => {
-        const linkToCopy = "https://www.tinydesk.me";
+        const linkToCopy = "https://www.minidesk.me";
         navigator.clipboard.writeText(linkToCopy);
         setTooltipVisible(true);
         setTimeout(() => setTooltipVisible(false), 1500);
@@ -53,7 +53,7 @@ export default function TabPanel2() {
             <Box display="flex" alignItems="center" justifyContent={'left'} gap={1} mt={2}>
                 <div style={{display: 'flex',}}>
                     <Typography variant="subtitle1" sx={{flexGrow: 1,marginTop:1.5}}>
-                        https://www.tinydesk.me
+                        https://www.minidesk.me
                     </Typography>
                     <button
                         onClick={handleCopy}

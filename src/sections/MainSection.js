@@ -53,7 +53,7 @@ const navigateToUrl = (url) => {
 };
 
 const auth = async () => {
-    const URL = process.env.REACT_APP_BACKEND_URL;  // Correctly accessing the backend URL
+    const URL = process.env.REACT_APP_BACKEND_URL;
     console.log(URL);
 
     try {
