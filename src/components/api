@@ -1,12 +1,17 @@
- /*
-   *       Post: http://localhost:5000/api/notes
-   *       Put: http://localhost:5000/api/notes
-   *       Delete: http://localhost:5000/api/notes
-   * */
-
-
-/*
-   *       Post: http://localhost:5000/api/todos
-   *       Put: http://localhost:5000/api/todos
-   *       Delete: http://localhost:5000/api/todos
-   * */
+ const handlePutBackgroundImage = async () => {
+        if (!selectedImage) {
+            alert('Please select an image before saving.');
+            return;
+        }
+        console.log(selectedImage)
+        try {
+            await apiCall({
+                method: 'PUT',
+                endpoint: 'image',
+                body: { backgroundImage: selectedImage },
+            });
+            handleClose();
+        } catch (e) {
+            console.error('Error updating background image:', e);
+        }
+    };

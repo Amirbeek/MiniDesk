@@ -46,25 +46,13 @@ const Cancel = styled(Button)`
     }
 `;
 
-const EditBackgroundImage = ({ UserInfo, setUserInfo }) => {
-    const [open, setOpen] = useState(false);
-    const [Background, setBackground] = useState(UserInfo.backgroundImage);
+const EditBackgroundImage = ({open,setOpen, setUserInfo ,handleClose}) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [imageResults, setImageResults] = useState([]);
     const [selectedImage, setSelectedImage] = useState(null);
     const apiCall = useApi();
     const unsplash = createApi({ accessKey: 'F_m5vYnTS9mDqW2Zxcz62djK0Ldc5xxHZJuKqC9hXOg' });
 
-    const handleOpen = () => {
-        setOpen(true);
-    };
-
-    const handleClose = () => {
-        setOpen(false);
-        setSearchQuery('');
-        setImageResults([]);
-        setSelectedImage(null);
-    };
     const handleSetBackground =(url)=>{
         setUserInfo((prev) => ({
             ...prev,
@@ -105,10 +93,9 @@ const EditBackgroundImage = ({ UserInfo, setUserInfo }) => {
 
     return (
         <>
-            <MenuItem onClick={handleOpen}>Edit background image</MenuItem>
             <Modal
                 open={open}
-                onClose={handleClose}
+                onClose={()=>handleClose(false)}
                 aria-labelledby="user-info-modal"
                 aria-describedby="user-info-description"
             >
@@ -162,7 +149,7 @@ const EditBackgroundImage = ({ UserInfo, setUserInfo }) => {
                         Save Changes
                     </Button>
                     <Cancel
-                        onClick={handleClose}
+                        onClick={()=>handleClose(false)}
                     >
                         Cancel
                     </Cancel>

@@ -8,6 +8,7 @@ import Todo from "../dashboard-sections/Todo";
 import Note from "../dashboard-sections/Note";
 import ScrollBox from "../components/ScrollBox";
 import { EditHomePageContext } from "../components/EditHomePage";
+import EditBackgroundImage from "../components/EditBackgroundImage";
 
 const BackImage = styled.div`
     background: ${(props) => `url("${props.imageUrl}") no-repeat center center`};
@@ -36,6 +37,8 @@ const Dashboard = () => {
     const [userData, setUserData] = useState(null);
     const { editMode, setEditMode } = useContext(EditHomePageContext);
     const apiCall = useApi();
+    const [open, setOpen] = useState(false);
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -67,6 +70,13 @@ const Dashboard = () => {
             setEditMode(false);
         }
     };
+    const handleOpen = () => {
+        setOpen(true);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
+    };
     return (
         <div>
             <BackImage
@@ -76,7 +86,7 @@ const Dashboard = () => {
             >
                 {userData ? (
                     <div style={{ position: 'relative' }}  >
-                        <NewNavbar UserInfo={userData} setUserInfo={setUserData}/>
+                        <NewNavbar UserInfo={userData} setUserInfo={setUserData} handleOpen={handleOpen}/>
                         <Grid container spacing={2}>
                             <Grid item xs={12} sm={4} md={8 } onClick={handleGridClick} >
                                 <ScrollBox editMode={editMode} marks={userData['marks']}/>
@@ -96,6 +106,7 @@ const Dashboard = () => {
                     </div>
                 ) : <span>Loading...</span>}
             </BackImage>
+            <EditBackgroundImage open={open} setOpen={setOpen} handleClose={handleClose} UserInfo={userData} setUserInfo={setUserData} />
         </div>
     );
 };

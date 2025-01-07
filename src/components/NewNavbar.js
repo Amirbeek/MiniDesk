@@ -60,7 +60,7 @@ const SearchInput = styled.input`
 `;
 
 
-export default function MenuAppBar({ UserInfo ,setUserInfo}) {
+export default function MenuAppBar({ UserInfo ,setUserInfo,handleOpen}) {
     const { editMode, setEditMode} = useContext(EditHomePageContext);
     const [query, setQuery] = useState('');
 
@@ -158,7 +158,7 @@ export default function MenuAppBar({ UserInfo ,setUserInfo}) {
                             onClose={handleClose}
                         >
                             <Settings UserInfo={UserInfo} />
-                            <EditBackgroundImage UserInfo={UserInfo} setUserInfo={setUserInfo} />
+                            <MenuItem onClick={()=>handleOpen(true)} >Edit Background Image</MenuItem>
                             <MenuItem
                                 onClick={() => {
                                     handelOffEditMode();
