@@ -16,43 +16,43 @@ export default function TabPanel2() {
 
     return (
         <>
-            <Typography variant="h6" gutterBottom  sx={{
+            <Typography variant="h6" gutterBottom sx={{
                 textTransform: "uppercase",
             }}>
                 How to set Tiny Desk as Homepage for Chrome
             </Typography>
             <ol>
                 <li>
-                    <Typography sx={{flexGrow: 1}} variant="body1">
+                    <Typography sx={{ flexGrow: 1 }} variant="body1">
                         Click <MoreVertIcon sx={{
                         verticalAlign: "middle",
                         backgroundColor: "#504f4f",
                         padding: "2px",
                         borderRadius: "4px"
-                    }}/> and go to Settings
+                    }} /> and go to Settings
                     </Typography>
                 </li>
 
                 <li>
-                    <Typography sx={{marginTop: 3}} variant="body1">
-                        Click "On startup" Tap
+                    <Typography sx={{ marginTop: 3 }} variant="body1">
+                        Click &quot;On startup&quot; Tab
                     </Typography>
                 </li>
                 <li>
-                    <Typography sx={{marginTop: 3}} variant="body1">
-                        Select "Open a specific page or set of pages" and click "Add a new page"
+                    <Typography sx={{ marginTop: 3 }} variant="body1">
+                        Select &quot;Open a specific page or set of pages&quot; and click &quot;Add a new page&quot;
                     </Typography>
                 </li>
                 <li>
-                    <Typography sx={{marginTop: 3}} variant="body1">
+                    <Typography sx={{ marginTop: 3 }} variant="body1">
                         Copy and paste URL
                     </Typography>
                 </li>
             </ol>
 
             <Box display="flex" alignItems="center" justifyContent={'left'} gap={1} mt={2}>
-                <div style={{display: 'flex',}}>
-                    <Typography variant="subtitle1" sx={{flexGrow: 1,marginTop:1.5}}>
+                <div style={{ display: 'flex' }}>
+                    <Typography variant="subtitle1" sx={{ flexGrow: 1, marginTop: 1.5 }}>
                         https://www.minidesk.me
                     </Typography>
                     <button
@@ -62,7 +62,7 @@ export default function TabPanel2() {
                             background: 'transparent',
                             cursor: 'pointer',
                             gap: '5px',
-                            color:'#000',
+                            color: '#000',
                         }}
                     >
                         <ContentCopyIcon />
@@ -75,9 +75,7 @@ export default function TabPanel2() {
                 )}
             </Box>
 
-            <img url={GUIImage} alt="" style={{ width: '100%' }} src={GUIImage} />
-
-
+            <img src={GUIImage} alt="" style={{ width: '100%' }} />
         </>
     );
 }

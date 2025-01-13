@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Typography, Box } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import GUIImage from '../background_images/s.jpg';
+
 export default function TabPanel1() {
     const [tooltipVisible, setTooltipVisible] = useState(false);
 
@@ -14,7 +15,7 @@ export default function TabPanel1() {
 
     return (
         <>
-            <Typography variant="h6"  sx={{
+            <Typography variant="h6" sx={{
                 textTransform: "uppercase",
             }} gutterBottom>
                 How to set Tiny Desk as Homepage for Chrome
@@ -34,20 +35,20 @@ export default function TabPanel1() {
                     </Typography>
                 </li>
                 <li>
-                    <Typography sx={{marginTop:3 }} variant="body1">
-                        Search for "Mini Desk"
+                    <Typography sx={{ marginTop: 3 }} variant="body1">
+                        Search for &quot;Mini Desk&quot;
                     </Typography>
                 </li>
                 <li>
-                    <Typography sx={{marginTop:3 }}  variant="body1">
-                        Click "Add to Chrome"
+                    <Typography sx={{ marginTop: 3 }} variant="body1">
+                        Click &quot;Add to Chrome&quot;
                     </Typography>
                 </li>
             </ol>
 
             <Box display="flex" alignItems="center" justifyContent={'left'} gap={1} mt={2}>
-                <div style={{display: 'flex', }}>
-                    <Typography variant="subtitle1" sx={{ flexGrow: 1 ,marginTop:1.5}}>
+                <div style={{ display: 'flex' }}>
+                    <Typography variant="subtitle1" sx={{ flexGrow: 1, marginTop: 1.5 }}>
                         https://www.minidesk.me
                     </Typography>
                     <button
@@ -57,7 +58,7 @@ export default function TabPanel1() {
                             background: 'transparent',
                             cursor: 'pointer',
                             gap: '5px',
-                            color:'#000',
+                            color: '#000',
                         }}
                     >
                         <ContentCopyIcon />
@@ -70,9 +71,8 @@ export default function TabPanel1() {
                 )}
             </Box>
 
-            <img url={GUIImage} alt="" style={{ width: '100%' }} src={GUIImage} />
-
-
+            {/* Removed url attribute, keeping only src */}
+            <img src={GUIImage} alt="" style={{ width: '100%' }} />
         </>
     );
 }

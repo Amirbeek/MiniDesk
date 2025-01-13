@@ -20,7 +20,7 @@ import StyledListItem from "./widget_component/StyledListItem";
 import ListWrapper  from "./widget_component/ListWrapper";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
-const NotesWindow = ({ open, setOpen, NoteData }, ref) => {
+const NotesWindow = ({ open, setOpen, NoteData }) => {
     const [notes, setNotes] = useState(NoteData);
     const [selectedNote, setSelectedNote] = useState(null);
     const [editorState, setEditorState] = useState(EditorState.createEmpty());

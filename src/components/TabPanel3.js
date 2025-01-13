@@ -3,6 +3,7 @@ import { Typography, Box } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import GUIImage from '../background_images/s2.jpg';
 import DensityMediumIcon from '@mui/icons-material/DensityMedium';
+
 export default function TabPanel3() {
     const [tooltipVisible, setTooltipVisible] = useState(false);
 
@@ -15,43 +16,43 @@ export default function TabPanel3() {
 
     return (
         <>
-            <Typography variant="h6" gutterBottom  sx={{
+            <Typography variant="h6" gutterBottom sx={{
                 textTransform: "uppercase",
             }}>
                 How to set Tiny Desk as Homepage for Firefox
             </Typography>
             <ol>
                 <li>
-                    <Typography sx={{flexGrow: 1}} variant="body1">
+                    <Typography sx={{ flexGrow: 1 }} variant="body1">
                         Click <DensityMediumIcon sx={{
                         verticalAlign: "middle",
                         backgroundColor: "#504f4f",
                         padding: "2px",
                         borderRadius: "4px"
-                    }}/> and go to Preferences
+                    }} /> and go to Preferences
                     </Typography>
                 </li>
 
                 <li>
-                    <Typography sx={{marginTop: 3}} variant="body1">
-                        Click "Home" tab
+                    <Typography sx={{ marginTop: 3 }} variant="body1">
+                        Click &quot;Home&quot; tab
                     </Typography>
                 </li>
                 <li>
-                    <Typography sx={{marginTop: 3}} variant="body1">
-                        On "Homepage and new windows", select "Custom URLs..."
+                    <Typography sx={{ marginTop: 3 }} variant="body1">
+                        On &quot;Homepage and new windows&quot;, select &quot;Custom URLs...&quot;
                     </Typography>
                 </li>
                 <li>
-                    <Typography sx={{marginTop: 3}} variant="body1">
+                    <Typography sx={{ marginTop: 3 }} variant="body1">
                         Copy and paste URL into the URL field
                     </Typography>
                 </li>
             </ol>
 
             <Box display="flex" alignItems="center" justifyContent={'left'} gap={1} mt={2}>
-                <div style={{display: 'flex',}}>
-                    <Typography variant="subtitle1" sx={{flexGrow: 1,marginTop:1.5}}>
+                <div style={{ display: 'flex' }}>
+                    <Typography variant="subtitle1" sx={{ flexGrow: 1, marginTop: 1.5 }}>
                         https://www.minidesk.me
                     </Typography>
                     <button
@@ -61,7 +62,7 @@ export default function TabPanel3() {
                             background: 'transparent',
                             cursor: 'pointer',
                             gap: '5px',
-                            color:'#000',
+                            color: '#000',
                         }}
                     >
                         <ContentCopyIcon />
@@ -74,9 +75,8 @@ export default function TabPanel3() {
                 )}
             </Box>
 
-            <img url={GUIImage} alt="" style={{ width: '100%' }} src={GUIImage} />
-
-
+            {/* Removed the 'url' attribute, only 'src' remains */}
+            <img src={GUIImage} alt="" style={{ width: '100%' }} />
         </>
     );
 }

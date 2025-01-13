@@ -9,7 +9,6 @@ import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import Settings from "./Settings";
 import {useContext, useState} from "react";
 import {EditHomePageContext} from "./EditHomePage";
-import EditBackgroundImage from "./EditBackgroundImage";
 import styled from "styled-components";
 import Guidelines from "./Guidelines";
 import SettingButton from "./SettingButton";
@@ -60,7 +59,7 @@ const SearchInput = styled.input`
 `;
 
 
-export default function MenuAppBar({ UserInfo ,setUserInfo,handleOpen}) {
+export default function MenuAppBar({ UserInfo ,handleOpen}) {
     const { editMode, setEditMode} = useContext(EditHomePageContext);
     const [query, setQuery] = useState('');
 
