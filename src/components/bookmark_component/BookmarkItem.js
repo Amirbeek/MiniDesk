@@ -13,7 +13,12 @@ const vibration = keyframes`
 `;
 
 const SingleBookMark = styled.div`
-    cursor: ${(props) => (props.editMode ? "default" : "pointer")};
+    cursor: ${(props) => (props.$editMode ? "default" : "pointer")};
+    ${(props) =>
+            props.$editMode &&
+            css`
+            animation: ${vibration} 0.5s infinite;
+        `}
     text-align: center;
     transition: all 0.3s ease;
     color: #eeeeee;
@@ -59,7 +64,7 @@ const BookmarkItem = ({ bookmark, onDelete }) => {
     return (
         <SingleBookMark
             onClick={handleClick}
-            editMode={editMode}
+            $editMode={editMode}
             role="button"
             aria-label={`Bookmark: ${bookmark.title}`}
         >

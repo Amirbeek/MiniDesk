@@ -11,11 +11,11 @@ import { EditHomePageContext } from "../components/EditHomePage";
 import EditBackgroundImage from "../components/EditBackgroundImage";
 
 const BackImage = styled.div`
-    background: ${(props) => `url("${props.imageUrl}") no-repeat center center`};
+    background: ${(props) => `url("${props.$imageUrl}") no-repeat center center`};
     background-size: cover;
     min-height: 100vh;
     position: relative;
-    background-color: ${(props) => (props.editMode ? 'red' : '#000')};
+    background-color: ${(props) => (props.$editMode ? 'red' : '#000')};
     overflow: hidden;
     &::after {
         content: '';
@@ -24,13 +24,14 @@ const BackImage = styled.div`
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: ${(props) => (props.editMode ? 'rgba(0, 0, 0, 0.7)' : 'transparent')};
+        background-color: ${(props) => (props.$editMode ? 'rgba(0, 0, 0, 0.7)' : 'transparent')};
         z-index: 1;
     }
     > * {
         z-index: 2;
     }
 `;
+
 
 
 const Dashboard = () => {
@@ -80,9 +81,9 @@ const Dashboard = () => {
     return (
         <div>
             <BackImage
-                editMode={editMode}
+                $editMode={editMode}
                 onClick={handleBackgroundClick}
-                imageUrl={userData?.backgroundImage }
+                $imageUrl={userData?.backgroundImage }
             >
                 {userData ? (
                     <div style={{ position: 'relative' }}  >
