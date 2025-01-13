@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, Box, Button, MenuItem, TextField } from '@mui/material';
+import { Modal, Box, Button, TextField } from '@mui/material';
 import styled from 'styled-components';
 import { createApi } from 'unsplash-js';
 import useApi from '../useApi';
