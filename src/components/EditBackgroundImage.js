@@ -46,7 +46,7 @@ const Cancel = styled(Button)`
     }
 `;
 
-const EditBackgroundImage = ({open,setOpen, setUserInfo ,handleClose}) => {
+const EditBackgroundImage = ({open, setUserInfo ,handleClose}) => {
     const [searchQuery, setSearchQuery] = useState('');
     const [imageResults, setImageResults] = useState([]);
     const [selectedImage, setSelectedImage] = useState(null);
