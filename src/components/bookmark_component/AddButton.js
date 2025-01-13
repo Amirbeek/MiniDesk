@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { FolderPlus } from 'react-feather';
+import React from 'react';
 
 const AddButton = styled.div.attrs({
     children: <FolderPlus />,

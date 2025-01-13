@@ -12,7 +12,7 @@ function Note({notesData,onChangeMode}) {
     const Component_data = (
         <>
             {notesData.slice(0, 4).map((note, index) => (
-                <div>
+                <div key={index}>
                     <span key={index}>{note.title}</span>
                 </div>
             ))}

@@ -23,6 +23,10 @@ const GoogleButtonStyle = styled.button`
 
 const AboutContainer = styled.div`
     padding: 100px;
+    width: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     text-align: left;
 
     h1 {
@@ -99,18 +103,20 @@ const About = () => {
         <Grid container spacing={2}>
             <Grid item xs={12} md={6}>
                 <AboutContainer>
-                    <h1>
-                        Welcome to MiniDesk
-                        <br />
-                        <span>{currentText}</span> your productivity companion
-                    </h1>
-                    <GoogleButtonStyle type="button" onClick={auth}>
-                        Sign in with Google
-                    </GoogleButtonStyle>
+                    <div>
+                        <h1>
+                            Welcome to MiniDesk
+                            <br/>
+                            <span>{currentText}</span> your productivity companion
+                        </h1>
+                        <GoogleButtonStyle type="button" onClick={auth}>
+                            Sign in with Google
+                        </GoogleButtonStyle>
+                    </div>
                 </AboutContainer>
             </Grid>
             <Grid item xs={12} md={6}>
-                <img src={Bimage} alt="Mini Desk Overview" style={{ width: '100%', borderRadius: '10px' }} />
+                <img src={Bimage} alt="Mini Desk Overview" style={{width: '100%', borderRadius: '10px'}}/>
             </Grid>
         </Grid>
     );
