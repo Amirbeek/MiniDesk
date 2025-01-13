@@ -84,5 +84,9 @@
   "engines": {
     "node": "22.x",
     "npm": "10.x"
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@babel/plugin-transform-private-property-in-object": "^7.25.9"
   }
 }
