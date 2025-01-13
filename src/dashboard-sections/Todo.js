@@ -69,7 +69,10 @@ function Todo({ todosData,onChangeMode }) {
                 onClick={() => { handleClickOpen(); onChangeMode(false)}}
 
             >
-                <ComponentButton header={'To Do List'} HeaderColor={'#333'} children={Component_data} />
+                <ComponentButton header={'To Do List'} HeaderColor={'#333'}>
+                    {Component_data}
+                </ComponentButton>
+
             </button>
 
             <TodosWindow

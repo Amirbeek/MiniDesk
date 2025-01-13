@@ -40,7 +40,9 @@ function Note({notesData,onChangeMode}) {
                     onChangeMode(false)
                 }}
             >
-                <ComponentButton header={'Note'} HeaderColor={'#e77f23'} children={Component_data} />
+                <ComponentButton header={'Note'} HeaderColor={'#e77f23'} >
+                    {Component_data}
+                </ComponentButton>
             </button>
 
             <NotesWindow
