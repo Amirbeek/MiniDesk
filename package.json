@@ -1,6 +1,8 @@
 {
-  "name": "password-reset-app",
+  "name": "minidesk",
   "version": "0.1.0",
+  "description": "A minimalistic desk organization app.",
+  "author": "Amirbek Shomurodov",
   "private": true,
   "scripts": {
     "start": "serve -s build",
