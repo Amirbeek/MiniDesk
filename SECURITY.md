@@ -12,7 +12,7 @@ The following table lists the versions of the project that are currently support
 
 If you discover a vulnerability in this project, please follow the steps below to report it:
 
-1. **Where to Report**: Submit the vulnerability details to [Contact ME](https://amirbekshomurodov.com). Ensure you include "Vulnerability Report" in the subject line for quick identification.
+1. **Where to Report**: Submit the vulnerability details to [Contact ME](https://amirbekshomurodov.me/contact). Ensure you include "Vulnerability Report" in the subject line for quick identification.
    
 2. **Response Timeline**:
    - You will receive an acknowledgment of your report within 48 hours.
