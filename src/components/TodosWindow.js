@@ -197,6 +197,7 @@ const TodosWindow =({ open, setOpen ,todosData}) => {
 
     const handleAddTask = async () => {
         if (selectedTodo) {
+            await handleTaskSave()
             const newTask = {text: "New Task", done: false };
             const updatedTodo = {
                 ...selectedTodo,
@@ -361,7 +362,10 @@ const TodosWindow =({ open, setOpen ,todosData}) => {
                                             <div ref={provided.innerRef} {...provided.droppableProps}>
                                                      <List>
                                                          {selectedTodo.todos.map((task,index) => (
-                                                             <Draggable key={task._id} draggableId={task._id} index={index}>
+                                                             <Draggable
+                                                                 key={task._id}
+                                                                 draggableId={task._id}
+                                                                 index={index}>
                                                                  {(provided) => (
                                                                      <div
                                                                          ref={provided.innerRef}
