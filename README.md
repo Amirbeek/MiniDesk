@@ -9,7 +9,7 @@ This project was developed under the supervision of Alex Kuhn, a former Apple En
 
 ## Technologies
 - **Frontend:** React.js with Material UI
-- **Backend:** Express.js
+- **Backend:** Deno
 - **Deployment:** Hosted on Heroku
 
 ## Access to Backend Code
