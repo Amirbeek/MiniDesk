@@ -1,6 +1,6 @@
 # MiniDesk
 
-![MiniDesk Screenshot](https://www.amirbekshomurodov.me/images/minidesk.png)
+![MiniDesk Screenshot](https://minidesk.me/static/media/Bimage.da6f28e5b65ca2d6be01.png)
 
 ## Overview
 MiniDesk is a web application designed to boost user productivity by allowing them to manage bookmarks and utilize handy widgets. It also functions as a browser extension, offering a seamless integration into the user's daily workflow.
