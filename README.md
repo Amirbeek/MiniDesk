@@ -1,3 +1,4 @@
+⭐ If you find this project helpful, consider giving it a star on GitHub! ⭐
 # MiniDesk
 
 ![MiniDesk Screenshot](https://minidesk.me/static/media/Bimage.da6f28e5b65ca2d6be01.png)
